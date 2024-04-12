@@ -10,15 +10,12 @@ const verifyToken = (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, SECRETKEY);
-    req.userId = decoded.userId; // Attach userId to request object for later use
+    req.userId = decoded.userId;
     next();
   } catch (error) {
     return res.status(403).json({ message: 'Invalid token' });
   }
 };
 
-exports.getToken = (emai, userId)=>{
-  return jwt.sign({ email, userId }, SECRETKEY)
-}
 
 module.exports = verifyToken;

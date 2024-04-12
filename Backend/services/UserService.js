@@ -1,49 +1,33 @@
 const User = require('../models/User');
-const JWT = require('../middlewares/authUser')
+const JWT = require('../utils/jwtVerify');
 
-exports.signUpUser = async (req, res) => {
-    try {
-        const { email, password, firstName, lastName } = req.body;
-        const existingUser = await User.findOne({ email })
-        if (existingUser) {
-            res.status(400).send("Email already register");
-            return;
-        }
-        const newUser = new User({
-            email, password, firstName, lastName
-        })
-        await newUser.save();
-        res.status(201).send({ message: 'User created successfully' });
-    } catch (err) {
-        console.error(err);
-        res.status(500).send({ message: 'Error creating user' });
+exports.signUpUser = async ({ email, password, firstName, lastName }) => {
+  try {
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return null; // User already exists
     }
+    const newUser = new User({ email, password, firstName, lastName });
+    return await newUser.save();
+  } catch (err) {
+    console.error(err);
+    throw new Error('Error creating user');
+  }
 }
 
-
-exports.loginUser = async (req, res) => {
-    try {
-        const email = req.body.email;
-        const password = req.body.password
-
-        const user = await User.findOne({ email })
-        if (!user) {
-            res.status(400).send("User/Email does not exist");
-            return;
-        }
-        else if (user.password != password) {
-            res.status(400).send("Wrong password");
-            return;
-        }
-        // create token
-        const userId = user._id
-        let token = JWT.getToken(email, userId);
-        //return response with token
-        res.status(200).send({ token: token, "name": `${user.firstName} ${user.lastName}` })
-    } catch (err) {
-        console.error(err);
-        res.status(500).send({ message: 'Login Error' });
+exports.loginUser = async (email, password) => {
+  try {
+    const user = await User.findOne({ email });
+    if (!user || user.password !== password) {
+      return null; // User/email or password is incorrect
     }
+    const userId = user._id;
+    const token = JWT.getToken(email, userId);
+    return { token, name: `${user.firstName} ${user.lastName}` };
+  } catch (err) {
+    console.error(err);
+    throw new Error('Login Error');
+  }
 }
 
 
