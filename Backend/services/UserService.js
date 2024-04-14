@@ -31,11 +31,20 @@ exports.loginUser = async (email, password) => {
 }
 
 
-exports.getUserInfo = (userId) => {
-    const user = User.findOne(userId)
-    const userData = {
-        id: userId,
-        name: user.name
-    }
-    return userData;
-}
+exports.getUserInfo = async (userId) => {
+  try {
+      const user = await User.findOne({ _id: userId });
+      if (!user) {
+          throw new Error("User not found");
+      }
+      const userData = {
+          id: userId,
+          firstName: user.firstName,
+          lastName : user.lastName
+        };
+      return userData;
+  } catch (err) {
+      console.error(err);
+      throw new Error("Error retrieving user information");
+  }
+};

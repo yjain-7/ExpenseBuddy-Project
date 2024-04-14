@@ -1,19 +1,109 @@
 const User = require('../models/User');
 const Group = require('../models/Group')
-const getUserData = require('./UserService')
-const getExpenseData = require('./ExpenseService')
-const getDebtData = require('./DebtExpense')
+const userService = require('./UserService')
+// const getExpenseData = require('./ExpenseService')
+// const getDebtData = require('./DebtExpense')
 
-exports.getGroupData = (group)=>{
-    let groupInfo = {
-        name : group.name,
-        groupCode : group.token,
-        description : group.description,
-        createdBy : getUserData(group.createdBy),
-        usersList : group.usersList.map(user => getUserData(user)),
-        expenseList : group.expenseList.map(expense => getExpenseData(expense)),
-        unsettled : group.unsettled.map(debt => getUserDebtData(debt)),
-        settled : group.unsettled.map(debt => getDebtData(debt)),
+exports.createGroup = async (userId, name, description) => {
+    try {
+        const groupCode = generateGroupCode();
+        const newGroup = new Group({
+            groupCode,
+            name,
+            description,
+            createdBy: userId,
+        });
+        newGroup.usersList.push(userId);
+        const group = await newGroup.save();
+
+        // Update user with the new group ID
+        const user = await User.findOne({ _id: userId });
+        if (!user) {
+            throw new Error("User not found");
+        }
+        user.groupsList.push(group._id);
+        await user.save();
+        return this.getGroupData(group);
+    } catch (err) {
+        console.error(err);
+        throw new Error("Error creating group");
     }
-} 
+};
+
+exports.joinGroup = async (userId, groupCode) => {
+    try {
+        let group = await Group.findOne({ groupCode });
+        if (!group) {
+            throw new Error("Invalid groupCode");
+        }
+
+        // Check if user is already in that group
+        if (userAlreadyExist(group, userId)) {
+            throw new Error("User already in the group");
+        }
+
+        group.usersList.push(userId);
+        await group.save();
+
+        const user = await User.findOne({ _id: userId });
+        if (!user) {
+            throw new Error("User not found");
+        }
+        user.groupsList.push(group._id);
+        await user.save();
+
+        return this.getGroupData(group);
+    } catch (err) {
+        console.error(err);
+        throw new Error("Error joining group");
+    }
+};
+
+exports.getAllGroups = async()=>{
+    try {
+        const groupData = await Group.find().exec();
+        const groupList = await Promise.all(groupData.map(group => getGroupData(group)));
+        console.log(groupList); 
+        return groupList;
+    } catch (err) {
+        console.error(err); // Log any errors that occur during the process
+        res.status(500).send('Internal Server Error'); // Sending an error response if something goes wrong
+    }
+}
+
+async function getGroupData(group){
+    try {
+        let groupInfo = {
+            name: group.name,
+            groupCode: group.token,
+            description: group.description,
+            createdBy: await userService.getUserInfo(group.createdBy),
+            usersList: await Promise.all(group.usersList.map(async (user) => {
+                return await userService.getUserInfo(user);
+            })),
+            expenseList: group.expenseList,
+            unsettled: group.unsettled,
+            settled: group.settled
+        };
+        return groupInfo;
+    } catch (err) {
+        console.error(err);
+        throw new Error("Error retrieving group data");
+    }
+};
+
+function generateGroupCode() {
+    console.log("Generating group code")
+    let groupCode = '';
+    const charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*';
+    const charsetLength = charset.length;
+    for (let i = 0; i < 6; i++) {
+        groupCode += charset.charAt(Math.floor(Math.random() * charsetLength));
+    }
+    return groupCode;
+}
+
+function userAlreadyExist(group, userId) {
+    return group.usersList.includes(userId);
+}
 
