@@ -1,8 +1,6 @@
 const User = require('../models/User');
 const Group = require('../models/Group')
 const userService = require('./UserService')
-// const getExpenseData = require('./ExpenseService')
-// const getDebtData = require('./DebtExpense')
 
 exports.createGroup = async (userId, name, description) => {
     try {
@@ -70,6 +68,26 @@ exports.getAllGroups = async()=>{
         res.status(500).send('Internal Server Error'); // Sending an error response if something goes wrong
     }
 }
+
+exports.addExpense = async (groupId, expense) => {
+    try {
+        const group = await Group.findById(groupId);
+        if (!group) {
+            throw new Error("Group not found");
+        }
+
+        group.expensesList.push(expense._id);
+        expense.debts.forEach(debtId => {
+            group.unsettled.push(debtId);
+        });
+
+        await group.save();
+        return true;
+    } catch (error) {
+        console.error(error);
+        return false;
+    }
+};
 
 async function getGroupData(group){
     try {

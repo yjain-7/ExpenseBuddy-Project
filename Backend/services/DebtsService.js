@@ -1,4 +1,4 @@
-const Debts = require('../models/UserDebts')
+const UserDebts = require('../models/UserDebts')
 
 exports.addDebt = async(debts) => {
 

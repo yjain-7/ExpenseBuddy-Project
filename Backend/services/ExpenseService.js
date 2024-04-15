@@ -1,18 +1,28 @@
 const Expense = require('../models/Expense')
+const debtsService = require('../services/DebtsService')
+exports.addExpense = async (req) => {
+    try {
+        const { title, totalAmount, userId, description, paidBy, groupId, debts } = req.body;
 
-exports.addExpense = async(req, groupId)=>{
-    const {title, totalAmount, userId, description, paidBy, debts, date} = req.body;
+        const debtsList = await debtsService.addDebt(debts);
+        if (!debtsList) {
+            throw new Error("Failed to create debts list");
+        }
 
-    const debtsList = debtsService.addDebts(debts);
-    const newExpense = new Expense({
-        title  : title,
-        totalAmount : totalAmount,
-        description : description,
-        createdBy : userId,
-        paidBy : paidBy,
-        group : groupId,
-        debts : debtsList,
-        date : date
-    })
-    return await newExpense.save();
-}
+        const newExpense = new Expense({
+            title: title,
+            totalAmount: totalAmount,
+            description: description,
+            createdBy: userId,
+            paidBy: paidBy,
+            groupId: groupId,
+            debts: debtsList,
+            date: new Date()
+        });
+
+        return await newExpense.save();
+    } catch (err) {
+        console.error(err);
+        return null;
+    }
+};
