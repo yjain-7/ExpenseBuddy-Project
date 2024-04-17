@@ -1,4 +1,6 @@
 const Expense = require('../models/Expense')
+const Debts = require('../models/UserDebts')
+const simplify = require('../utils/Simplify')
 const debtsService = require('../services/DebtsService')
 exports.addExpense = async (req) => {
     try {
@@ -26,3 +28,10 @@ exports.addExpense = async (req) => {
         return null;
     }
 };
+
+exports.simplify = async(unsettled)=>{
+    const unsettledDebts = await Debt.find({ _id: { $in: group.unsettled } });
+    const newUnsettledDebts = simplify.simplifyDebts(unsettledDebts);
+    const debtsList = await debtsService.addDebt(newUnsettledDebts);
+    return debtsList
+}

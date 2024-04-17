@@ -29,3 +29,16 @@ exports.addExpense = async (req, res) => {
         return res.status(500).json({ message: "Server error" });
     }
 };
+
+exports.simplify = async(req, res)=>{
+    try{
+        const groupCode = req.body.groupCode;
+        const group = await Group.findOne({groupCode : groupCode});
+        const debtsList = expenseService.simplify(group.unsettled);
+        group.unsettled = debtsList
+        await group.save();
+        return res.status(200).json({message : "Expenses simplified successfully"})
+    }catch(err){
+        return res.status(500).json({message : "Server error"})
+    }
+}
