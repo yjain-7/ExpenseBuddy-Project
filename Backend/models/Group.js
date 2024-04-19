@@ -7,7 +7,7 @@ const groupSchema = new mongoose.Schema({
   createdBy : { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   usersList: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   expensesList : [{type: mongoose.Schema.Types.ObjectId, ref: 'Expense'}],
-  unsettled: [{ type: mongoose.Schema.Types.ObjectId, ref: 'UserDebts' }],
+  unsettled: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Transaction' }],
   settled: [{ type: mongoose.Schema.Types.ObjectId, ref: 'UserDebts'}], 
 });
 

@@ -1,6 +1,6 @@
 const UserDebts = require('../models/UserDebts')
 
-exports.addDebt = async(debts) => {
+exports.createDebt = async(debts) => {
 
     const debtIds = [];
 
@@ -10,7 +10,6 @@ exports.addDebt = async(debts) => {
             owedBy: debtInfo.owedBy,
             padiBy: debtInfo.paidBy,
             amount: debtInfo.amount,
-            settled : false
         });
 
         // Save the new debt

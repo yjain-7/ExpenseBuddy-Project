@@ -4,7 +4,7 @@ const expenseService = require('../services/ExpenseService')
 const groupService = require('../services/GroupService')
 exports.addExpense = async (req, res) => {
     try {
-        // const userId = req.userId;
+        console.log(req.body)
         const groupCode = req.body.groupCode;
         const group = await Group.findOne({ groupCode: groupCode });
         if (!group) {
@@ -13,17 +13,18 @@ exports.addExpense = async (req, res) => {
         
         req.groupId = group._id;
         
-        const expense = await expenseService.addExpense(req);
+        const expense = await expenseService.createExpense(req);
+
         if (!expense) {
             return res.status(500).json({ message: "Failed to add expense" });
         }
-
-        const expenseAdded = await groupService.addExpense(req.groupId, expense);
-        if (!expenseAdded) {
+        console.log(req.debts)
+        const unsettled = await groupService.addExpense(req.groupId, req.body.debts, expense);
+        if (!unsettled) {
             return res.status(500).json({ message: "Failed to add expense to group" });
         }
         
-        return res.status(200).json({ message: "Expense added successfully" });
+        return res.status(200).json({ message: "Expense added successfully", expense : expense, unsettled : unsettled});
     } catch (err) {
         console.error(err);
         return res.status(500).json({ message: "Server error" });

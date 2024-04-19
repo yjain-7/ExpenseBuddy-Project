@@ -1,7 +1,7 @@
 const User = require('../models/User');
 const Group = require('../models/Group')
 const userService = require('./UserService')
-
+const transactionService = require('./TransactionService')
 exports.createGroup = async (userId, name, description) => {
     try {
         const groupCode = generateGroupCode();
@@ -21,7 +21,7 @@ exports.createGroup = async (userId, name, description) => {
         }
         user.groupsList.push(group._id);
         await user.save();
-        return this.getGroupData(group);
+        return getGroupData(group);
     } catch (err) {
         console.error(err);
         throw new Error("Error creating group");
@@ -50,18 +50,18 @@ exports.joinGroup = async (userId, groupCode) => {
         user.groupsList.push(group._id);
         await user.save();
 
-        return this.getGroupData(group);
+        return getGroupData(group);
     } catch (err) {
         console.error(err);
         throw new Error("Error joining group");
     }
 };
 
-exports.getAllGroups = async()=>{
+exports.getAllGroups = async () => {
     try {
         const groupData = await Group.find().exec();
         const groupList = await Promise.all(groupData.map(group => getGroupData(group)));
-        console.log(groupList); 
+        console.log(groupList);
         return groupList;
     } catch (err) {
         console.error(err); // Log any errors that occur during the process
@@ -69,27 +69,27 @@ exports.getAllGroups = async()=>{
     }
 }
 
-exports.addExpense = async (groupId, expense) => {
+exports.addExpense = async (groupId, debts, expense) => {
     try {
         const group = await Group.findById(groupId);
         if (!group) {
             throw new Error("Group not found");
         }
-
         group.expensesList.push(expense._id);
-        expense.debts.forEach(debtId => {
-            group.unsettled.push(debtId);
-        });
-
+        const unsettled = await transactionService.addUnsettled(group.unsettled, debts);
+        if (!unsettled) {
+            return false;
+        }
+        group.unsettled = unsettled
         await group.save();
-        return true;
+        return unsettled;
     } catch (error) {
         console.error(error);
         return false;
     }
 };
 
-async function getGroupData(group){
+async function getGroupData(group) {
     try {
         let groupInfo = {
             name: group.name,
