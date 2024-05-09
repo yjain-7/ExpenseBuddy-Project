@@ -23,7 +23,7 @@ exports.loginUser = async (email, password) => {
     }
     const userId = user._id;
     const token = JWT.getToken(email, userId);
-    return { token, name: `${user.firstName} ${user.lastName}` };
+    return {id : user.id, firstName : user.firstName, lastName : user.lastName, groupsList : user.groupsList, token : token};
   } catch (err) {
     console.error(err);
     throw new Error('Login Error');

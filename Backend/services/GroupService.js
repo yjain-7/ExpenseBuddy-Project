@@ -11,15 +11,15 @@ exports.createGroup = async (userId, name, description) => {
             description,
             createdBy: userId,
         });
-        newGroup.usersList.push(userId);
-        const group = await newGroup.save();
-
+        
         // Update user with the new group ID
         const user = await User.findOne({ _id: userId });
         if (!user) {
             throw new Error("User not found");
         }
-        user.groupsList.push(group._id);
+        newGroup.usersList.push({id : userId, name : user.firstName});
+        const group = await newGroup.save();
+        user.groupsList.push({id : group._id, name : group.name});
         await user.save();
         return getGroupData(group);
     } catch (err) {
@@ -40,14 +40,14 @@ exports.joinGroup = async (userId, groupCode) => {
             throw new Error("User already in the group");
         }
 
-        group.usersList.push(userId);
-        await group.save();
-
+        
         const user = await User.findOne({ _id: userId });
         if (!user) {
             throw new Error("User not found");
         }
-        user.groupsList.push(group._id);
+        group.usersList.push({id : userId, name : user.firstName});
+        await group.save();
+        user.groupsList.push({id : group._id, name : group.name});
         await user.save();
 
         return getGroupData(group);
@@ -93,7 +93,7 @@ async function getGroupData(group) {
     try {
         let groupInfo = {
             name: group.name,
-            groupCode: group.token,
+            groupCode: group.groupCode,
             description: group.description,
             createdBy: await userService.getUserInfo(group.createdBy),
             usersList: await Promise.all(group.usersList.map(async (user) => {
