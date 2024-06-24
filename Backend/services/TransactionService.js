@@ -2,6 +2,7 @@ const Transaction = require('../models/Transaction');
 const User = require('../models/User')
 
 async function getUserName(userId){
+    console.log(userId)
     const user = await User.findById(userId)
     console.log(user)
     return user.name

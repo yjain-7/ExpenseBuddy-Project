@@ -6,7 +6,7 @@ exports.createExpense = async (req) => {
     try {
         const { title, totalAmount, userId, description, paidBy, groupId, debts } = req.body;
 
-        const debtsList = await debtsService.createDebt(debts);
+        const debtsList = await debtsService.createDebt(debts, paidBy);
         if (!debtsList) {
             throw new Error("Failed to create debts list");
         }
@@ -21,7 +21,7 @@ exports.createExpense = async (req) => {
             debts: debtsList,
             date: new Date()
         });
-
+        
         return await newExpense.save();
     } catch (err) {
         console.error(err);

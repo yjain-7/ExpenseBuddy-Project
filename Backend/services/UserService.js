@@ -33,7 +33,7 @@ exports.loginUser = async (email, password) => {
 
 exports.getUserInfo = async (userId) => {
   try {
-      const user = await User.findOne({ _id: userId });
+      const user = await User.findOne(userId);
       if (!user) {
           throw new Error("User not found");
       }

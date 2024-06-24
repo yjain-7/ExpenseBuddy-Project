@@ -25,8 +25,11 @@ public class SimplifyDebts {
    */
   private static void createGraphForDebts() {
     //  List of all people in the group
-    String[] person = { "Alice", "Bob", "Charlie", "David", "Ema", "Fred", "Gabe"};
+    // String[] person = { "Alice", "Bob", "Charlie", "David", "Ema", "Fred", "Gabe"};
+    String[] person = { "Alice", "Bob", "Charlie"};
+    
     int n = person.length;
+
     //  Creating a graph with n vertices
     Dinics solver = new Dinics(n, person);
     //  Adding edges to the graph
@@ -78,24 +81,29 @@ public class SimplifyDebts {
     }
     //  Print the edges in the graph
     solver.printEdges();
+    System.out.println(solver.maxFlow);
     System.out.println();
   }
 
   private static Dinics addAllTransactions(Dinics solver) {
     //  Transactions made by Bob
-    solver.addEdge(1, 2, 40);
-    //  Transactions made by Charlie
-    solver.addEdge(2, 3, 20);
-    //  Transactions made by David
-    solver.addEdge(3, 4, 50);
-    //  Transactions made by Fred
-    solver.addEdge(5, 1, 10);
-    solver.addEdge(5, 2, 30);
-    solver.addEdge(5, 3, 10);
-    solver.addEdge(5, 4, 10);
-    //  Transactions made by Gabe
-    solver.addEdge(6, 1, 30);
-    solver.addEdge(6, 3, 10);
+    // solver.addEdge(1, 2, 40);
+    // //  Transactions made by Charlie
+    // solver.addEdge(2, 3, 20);
+    // //  Transactions made by David
+    // solver.addEdge(3, 4, 50);
+    // //  Transactions made by Fred
+    // solver.addEdge(5, 1, 10);
+    // solver.addEdge(5, 2, 30);
+    // solver.addEdge(5, 3, 10);
+    // solver.addEdge(5, 4, 10);
+    // //  Transactions made by Gabe
+    // solver.addEdge(6, 1, 30);
+    // solver.addEdge(6, 3, 10);
+
+    solver.addEdge(0, 1 , 50);
+    solver.addEdge(0, 2, 20);
+    solver.addEdge(1, 2 , 30);
     return solver;
   }
 

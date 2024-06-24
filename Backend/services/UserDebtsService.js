@@ -1,6 +1,6 @@
 const UserDebts = require('../models/UserDebts')
 
-exports.createDebt = async(debts) => {
+exports.createDebt = async(debts, paidBy) => {
 
     const debtIds = [];
 
@@ -8,7 +8,7 @@ exports.createDebt = async(debts) => {
     for (const debtInfo of debts) {
         const newDebt = new UserDebts({
             owedBy: debtInfo.owedBy,
-            padiBy: debtInfo.paidBy,
+            padiBy: paidBy,
             amount: debtInfo.amount,
         });
 

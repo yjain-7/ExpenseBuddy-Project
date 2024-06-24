@@ -5,23 +5,23 @@ const transactionService = require('./TransactionService')
 exports.createGroup = async (userId, name, description) => {
     try {
         const groupCode = generateGroupCode();
-        const newGroup = new Group({
-            groupCode,
-            name,
-            description,
-            createdBy: userId,
-        });
-        
-        // Update user with the new group ID
         const user = await User.findOne({ _id: userId });
         if (!user) {
             throw new Error("User not found");
         }
-        newGroup.usersList.push({id : userId, name : user.firstName});
+        const newGroup = new Group({
+            groupCode,
+            name,
+            description,
+            createdBy: {userId : userId, name : user.name},
+        });
+        
+        // Update user with the new group ID
+        newGroup.usersList.push({userId : userId, name : user.firstName});
         const group = await newGroup.save();
-        user.groupsList.push({id : group._id, name : group.name});
+        user.groupsList.push({groupId : group._id, name : group.name});
         await user.save();
-        return getGroupData(group);
+        return group
     } catch (err) {
         console.error(err);
         throw new Error("Error creating group");
@@ -45,12 +45,12 @@ exports.joinGroup = async (userId, groupCode) => {
         if (!user) {
             throw new Error("User not found");
         }
-        group.usersList.push({id : userId, name : user.firstName});
+        group.usersList.push({userId : userId, name : user.firstName});
         await group.save();
-        user.groupsList.push({id : group._id, name : group.name});
+        user.groupsList.push({groupId : group._id, name : group.name});
         await user.save();
 
-        return getGroupData(group);
+        return group;
     } catch (err) {
         console.error(err);
         throw new Error("Error joining group");
@@ -89,26 +89,15 @@ exports.addExpense = async (groupId, debts, expense) => {
     }
 };
 
-async function getGroupData(group) {
-    try {
-        let groupInfo = {
-            name: group.name,
-            groupCode: group.groupCode,
-            description: group.description,
-            createdBy: await userService.getUserInfo(group.createdBy),
-            usersList: await Promise.all(group.usersList.map(async (user) => {
-                return await userService.getUserInfo(user);
-            })),
-            expenseList: group.expenseList,
-            unsettled: group.unsettled,
-            settled: group.settled
-        };
-        return groupInfo;
-    } catch (err) {
+exports.getGroup = async(groupCode)=>{
+    try{
+        const group = Group.findOne({ groupCode });
+        return group;
+    }catch(err){
         console.error(err);
-        throw new Error("Error retrieving group data");
+        return false;
     }
-};
+}
 
 function generateGroupCode() {
     console.log("Generating group code")

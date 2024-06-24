@@ -5,7 +5,7 @@ const userSchema = new mongoose.Schema({
   firstName: String,
   lastName: String,
   password: { type: String, required: true },
-  groupsList: [{ userId: { type: mongoose.Schema.Types.ObjectId, ref: 'Group' }, name: String }]
+  groupsList: [{ groupId: { type: mongoose.Schema.Types.ObjectId, ref: 'Group' }, name: String, _id:false }]
 });
 
 const User = mongoose.model('User', userSchema);
