@@ -1,7 +1,8 @@
 const User = require('../models/User');
 const Group = require('../models/Group')
+const UserDebts = require('../models/UserDebts')
 const userService = require('./UserService')
-const transactionService = require('./TransactionService')
+const transactionService = require('./TransactionService');
 exports.createGroup = async (userId, name, description) => {
     try {
         const groupCode = generateGroupCode();
@@ -19,7 +20,7 @@ exports.createGroup = async (userId, name, description) => {
         // Update user with the new group ID
         newGroup.usersList.push({userId : userId, name : user.firstName});
         const group = await newGroup.save();
-        user.groupsList.push({groupId : group._id, name : group.name});
+        user.groupsList.push({groupId : group._id, name : group.name, groupCode : group.groupCode});
         await user.save();
         return group
     } catch (err) {
@@ -34,7 +35,6 @@ exports.joinGroup = async (userId, groupCode) => {
         if (!group) {
             throw new Error("Invalid groupCode");
         }
-
         // Check if user is already in that group
         if (userAlreadyExist(group, userId)) {
             throw new Error("User already in the group");
@@ -45,9 +45,12 @@ exports.joinGroup = async (userId, groupCode) => {
         if (!user) {
             throw new Error("User not found");
         }
+        if(group.usersList.length === 10){
+            return null;
+        }
         group.usersList.push({userId : userId, name : user.firstName});
         await group.save();
-        user.groupsList.push({groupId : group._id, name : group.name});
+        user.groupsList.push({groupId : group._id, name : group.name, groupCode : group.groupCode});
         await user.save();
 
         return group;
@@ -64,19 +67,21 @@ exports.getAllGroups = async () => {
         console.log(groupList);
         return groupList;
     } catch (err) {
-        console.error(err); // Log any errors that occur during the process
-        res.status(500).send('Internal Server Error'); // Sending an error response if something goes wrong
+        console.error(err); 
+        res.status(500).send('Internal Server Error');
     }
 }
+// req.groupId, req.debts, req.paidBy, expense
 
-exports.addExpense = async (groupId, debts, expense) => {
+exports.addExpense = async (groupId, debts, paidBy, expense) => {
     try {
+        console.log(groupId)
         const group = await Group.findById(groupId);
         if (!group) {
             throw new Error("Group not found");
         }
         group.expensesList.push(expense._id);
-        const unsettled = await transactionService.addUnsettled(group.unsettled, debts);
+        const unsettled = await transactionService.addUnsettled(group.unsettled, debts, paidBy);
         if (!unsettled) {
             return false;
         }
@@ -91,7 +96,7 @@ exports.addExpense = async (groupId, debts, expense) => {
 
 exports.getGroup = async(groupCode)=>{
     try{
-        const group = Group.findOne({ groupCode });
+        let group = await Group.findOne({ groupCode });
         return group;
     }catch(err){
         console.error(err);
@@ -112,5 +117,20 @@ function generateGroupCode() {
 
 function userAlreadyExist(group, userId) {
     return group.usersList.includes(userId);
+}
+
+async function getDebts(debts) {
+    let debtsList = [];
+    for (let debt of debts) {
+        try {
+            let debtData = await UserDebts.findById(debt);
+            if (debtData) {
+                debtsList.push(debtData);
+            }
+        } catch (error) {
+            console.error(`Error fetching debt with ID ${debt}:`, error);
+        }
+    }
+    return debtsList;
 }
 

@@ -7,31 +7,33 @@ async function getUserName(userId){
     console.log(user)
     return user.name
 }
-
-exports.addUnsettled = async (unsettled, debts) => {
+// group.unsettled, debts, paidBy
+exports.addUnsettled = async (unsettled, debts, paidBy) => {
+    console.log(debts)
+    
     if (unsettled.length === 0) {
         for (const debt of debts) {
-            if (debt.owedBy === debt.paidBy) {
+            if (debt.owedBy === paidBy) {
                 continue
             }
-            await saveTransaction(unsettled, debt)
+            await saveTransaction(unsettled, debt, paidBy)
         }
         console.log(unsettled)
         return unsettled
     } else {
         for (const debt of debts) {
-            if (debt.owedBy === debt.paidBy) {
+            if (debt.owedBy === paidBy) {
                 continue
             }
             try {
                 const transaction = await Transaction.findOne({
                     owedBy: debt.owedBy,
-                    paidBy: debt.paidBy,
+                    paidBy: paidBy,
                 })
 
                 const transactionInverse = await Transaction.findOne({
                     paidBy: debt.owedBy,
-                    owedBy: debt.paidBy,
+                    owedBy: paidBy,
                 })
 
                 if (transaction) {
@@ -39,9 +41,9 @@ exports.addUnsettled = async (unsettled, debts) => {
                     await transaction.save();
                 }
                 else if (transactionInverse) {
-                    inverseTransaction(unsettled, debt, transactionInverse)
+                    inverseTransaction(unsettled, debt, transactionInverse, paidBy)
                 } else {
-                    await saveTransaction(unsettled, debt);
+                    await saveTransaction(unsettled, debt, paidBy);
                 }
             } catch (err) {
                 console.log(err);
@@ -53,15 +55,15 @@ exports.addUnsettled = async (unsettled, debts) => {
     return unsettled
 };
 
-async function saveTransaction(unsettled, debt) {
+async function saveTransaction(unsettled, debt, paidBy) {
     try {
         const owedUserName = await getUserName(debt.owedBy);
-        const paidUserName = await getUserName(debt.paidBy);
+        const paidUserName = await getUserName(paidBy);
         console.log(owedUserName + " " +paidUserName)
         const transaction = new Transaction({
             owedBy: debt.owedBy,
             owedUserName : owedUserName,
-            paidBy: debt.paidBy,
+            paidBy: paidBy,
             paidUserName: paidUserName,
             amount: debt.amount,
             settled: false
@@ -73,7 +75,7 @@ async function saveTransaction(unsettled, debt) {
     }
 }
 
-async function inverseTransaction(unsettled, debt, transactionInverse) {
+async function inverseTransaction(unsettled, debt, transactionInverse,paidBy) {
     const newAmount = Math.abs(debt.amount - transactionInverse.amount);
     if(newAmount == 0){
         unsettled = unsettled.filter(id => id !== transactionInverse._id);
@@ -81,12 +83,12 @@ async function inverseTransaction(unsettled, debt, transactionInverse) {
     }
     if(debt.amount > transactionInverse.amount) {
         const owedUserName = await getUserName(debt.owedBy);
-        const paidUserName = await getUserName(debt.paidBy);
+        const paidUserName = await getUserName(paidBy);
         console.log(owedUserName + " " +paidUserName)
         const transaction = new Transaction({
             owedBy: debt.owedBy,
             owedUserName : owedUserName,
-            paidBy: debt.paidBy,
+            paidBy: paidBy,
             paidUserName: paidUserName,
             amount: newAmount,
             settled: false

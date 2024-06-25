@@ -18,6 +18,9 @@ exports.joinGroup = async (req, res) => {
         const userId = req.userId;
         const { groupCode } = req.body;
         const group = await groupService.joinGroup(userId, groupCode);
+        if(group == null){
+            res.status().json({message : "Error joining group, groupfull"})
+        }
         res.status(200).json({ message: "Group Joined Successfully", groupData: group });
     } catch (err) {
         console.error(err);
@@ -26,7 +29,8 @@ exports.joinGroup = async (req, res) => {
 };
 exports.getGroup = async(req, res) =>{
     try{
-        groupCode = req.groupCode
+        const groupCode = req.body.groupCode
+        console.log(groupCode)
         const group = await groupService.getGroup(groupCode)
         res.status(200).json({group})
     }
