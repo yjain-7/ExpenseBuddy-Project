@@ -40,33 +40,19 @@ To install Expense-Buddy, follow these steps:
     ```
 3. Install the required dependencies:
     ```bash
-    pip install -r requirements.txt
+    npm install
     ```
-
+4. Run Backend
+   ```bash
+    node app.js
+    ```
 ## Usage
 
 1. Create a group and add users.
 2. Add expenses and specify how they should be split among the users.
 3. Use the debt simplification feature to minimize the number of transactions.
 
-## Contributing
-
-We welcome contributions! Please follow these steps to contribute:
-
-1. Fork the repository.
-2. Create a new branch:
-    ```bash
-    git checkout -b feature-branch
-    ```
-3. Make your changes and commit them:
-    ```bash
-    git commit -m "Add some feature"
-    ```
-4. Push to the branch:
-    ```bash
-    git push origin feature-branch
-    ```
-5. Open a pull request.
+.
 
 ## License
 
