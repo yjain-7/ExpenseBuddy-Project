@@ -8,7 +8,7 @@ const groupSchema = new mongoose.Schema({
   usersList: [{ userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }, name: String, _id:false}],
   expensesList: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Expense' }],
   unsettled: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Transaction' }],
-  settled: [{ type: mongoose.Schema.Types.ObjectId, ref: 'UserDebts' }],
+  settled: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Transaction' }],
 });
 
 const Group = mongoose.model('Group', groupSchema);

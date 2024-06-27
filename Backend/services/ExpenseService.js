@@ -1,6 +1,5 @@
 const Expense = require('../models/Expense');
-const Transaction = require('../models/Transaction');
-const Debts = require('../models/UserDebts')
+const Debt = require('../models/Debt');
 const simplify = require('../utils/Simplify')
 const debtsService = require('./UserDebtsService')
 const ObjectId = require('mongoose').Types.ObjectId;
@@ -23,7 +22,7 @@ exports.createExpense = async (req) => {
             debts: debtsList,
             date: new Date()
         });
-        
+
         const expense = await newExpense.save();
         
         if(expense){
@@ -45,11 +44,11 @@ exports.simplify = async (unsettled) => {
     for (const trans of unsettled) {
         try {
             console.log(trans);
-            let transaction = await Transaction.findById(trans); // Await the findById call
-            if (transaction) { // Ensure the transaction is found
+            let transaction = await Debt.findById(trans);
+            if (transaction) { 
                 transactions.push({
-                    giver: transaction.paidBy.toString(), // Convert ObjectId to string
-                    receiver: transaction.owedBy.toString(), // Convert ObjectId to string
+                    giver: transaction.paidBy.toString(), 
+                    receiver: transaction.owedBy.toString(),
                     amount: transaction.amount
                 });
             }

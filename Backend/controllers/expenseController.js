@@ -1,7 +1,7 @@
-const User = require('../models/User')
 const Group = require('../models/Group')
 const expenseService = require('../services/ExpenseService')
 const groupService = require('../services/GroupService')
+
 exports.addExpense = async (req, res) => {
     try {
         console.log(req.body)

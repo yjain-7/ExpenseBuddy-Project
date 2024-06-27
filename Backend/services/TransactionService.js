@@ -1,12 +1,7 @@
+const mongoose = require('mongoose');
 const Transaction = require('../models/Transaction');
 const User = require('../models/User')
-
-async function getUserName(userId){
-    console.log(userId)
-    const user = await User.findById(userId)
-    console.log(user)
-    return user.name
-}
+const ObjectId = mongoose.Types.ObjectId;
 // group.unsettled, debts, paidBy
 exports.addUnsettled = async (unsettled, debts, paidBy) => {
     console.log(debts)
@@ -21,6 +16,7 @@ exports.addUnsettled = async (unsettled, debts, paidBy) => {
         console.log(unsettled)
         return unsettled
     } else {
+        console.log("Unsettled length is greater then 0")
         for (const debt of debts) {
             if (debt.owedBy === paidBy) {
                 continue
@@ -37,10 +33,12 @@ exports.addUnsettled = async (unsettled, debts, paidBy) => {
                 })
 
                 if (transaction) {
+                    console.log("Transaction found")
                     transaction.amount = transaction.amount + debt.amount;
                     await transaction.save();
                 }
                 else if (transactionInverse) {
+                    console.log("InverseTransaction found")
                     inverseTransaction(unsettled, debt, transactionInverse, paidBy)
                 } else {
                     await saveTransaction(unsettled, debt, paidBy);
@@ -57,14 +55,9 @@ exports.addUnsettled = async (unsettled, debts, paidBy) => {
 
 async function saveTransaction(unsettled, debt, paidBy) {
     try {
-        const owedUserName = await getUserName(debt.owedBy);
-        const paidUserName = await getUserName(paidBy);
-        console.log(owedUserName + " " +paidUserName)
         const transaction = new Transaction({
-            owedBy: debt.owedBy,
-            owedUserName : owedUserName,
             paidBy: paidBy,
-            paidUserName: paidUserName,
+            owedBy: debt.owedBy,
             amount: debt.amount,
             settled: false
         });
@@ -82,14 +75,9 @@ async function inverseTransaction(unsettled, debt, transactionInverse,paidBy) {
         await Transaction.deleteOne(transactionInverse)
     }
     if(debt.amount > transactionInverse.amount) {
-        const owedUserName = await getUserName(debt.owedBy);
-        const paidUserName = await getUserName(paidBy);
-        console.log(owedUserName + " " +paidUserName)
         const transaction = new Transaction({
-            owedBy: debt.owedBy,
-            owedUserName : owedUserName,
             paidBy: paidBy,
-            paidUserName: paidUserName,
+            owedBy: debt.owedBy,
             amount: newAmount,
             settled: false
         });
