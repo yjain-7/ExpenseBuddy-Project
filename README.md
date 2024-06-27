@@ -52,12 +52,3 @@ To install Expense-Buddy, follow these steps:
 2. Add expenses and specify how they should be split among the users.
 3. Use the debt simplification feature to minimize the number of transactions.
 
-.
-
-## License
-
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
-
-## Contact
-
-If you have any questions or suggestions, feel free to open an issue or contact us at your-email@example.com.
