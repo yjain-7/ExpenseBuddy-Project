@@ -23,7 +23,7 @@ exports.loginUser = async (email, password) => {
     }
     const userId = user._id;
     const token = JWT.getToken(email, userId);
-    return {id : user.id, firstName : user.firstName, lastName : user.lastName, groupsList : user.groupsList, token : token};
+    return { id: user.id, firstName: user.firstName, lastName: user.lastName, groupsList: user.groupsList, token: token };
   } catch (err) {
     console.error(err);
     throw new Error('Login Error');
@@ -33,18 +33,18 @@ exports.loginUser = async (email, password) => {
 
 exports.getUserInfo = async (userId) => {
   try {
-      const user = await User.findOne(userId);
-      if (!user) {
-          throw new Error("User not found");
-      }
-      const userData = {
-          id: userId,
-          firstName: user.firstName,
-          lastName : user.lastName
-        };
-      return userData;
+    const user = await User.findOne(userId);
+    if (!user) {
+      throw new Error("User not found");
+    }
+    const userData = {
+      id: userId,
+      firstName: user.firstName,
+      lastName: user.lastName
+    };
+    return userData;
   } catch (err) {
-      console.error(err);
-      throw new Error("Error retrieving user information");
+    console.error(err);
+    throw new Error("Error retrieving user information");
   }
 };

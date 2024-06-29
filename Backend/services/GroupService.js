@@ -1,6 +1,8 @@
 const User = require('../models/User');
 const Group = require('../models/Group')
 const transactionService = require('./TransactionService');
+const expenseService = require('./ExpenseService')
+const userService = require('./UserService')
 exports.createGroup = async (userId, name, description) => {
     try {
         const groupCode = generateGroupCode();
@@ -51,7 +53,7 @@ exports.joinGroup = async (userId, groupCode) => {
         user.groupsList.push({ groupId: group._id, name: group.name, groupCode: group.groupCode });
         await user.save();
 
-        return group;
+        return this.getGroup(groupCode);
     } catch (err) {
         console.error(err);
         throw new Error("Error joining group");
@@ -69,7 +71,6 @@ exports.getAllGroups = async () => {
         res.status(500).send('Internal Server Error');
     }
 }
-// req.groupId, req.debts, req.paidBy, expense
 
 exports.addExpense = async (groupId, debts, paidBy, expense) => {
     try {
@@ -92,15 +93,35 @@ exports.addExpense = async (groupId, debts, paidBy, expense) => {
     }
 };
 
+
 exports.getGroup = async (groupCode) => {
     try {
         let group = await Group.findOne({ groupCode });
-        return group;
+        let groupData = {
+            name: group.name,
+            description: group.description,
+            groupCode: groupCode,
+            createdBy: group.createdBy,
+            usersList: group.usersList,
+        };
+
+        // Await both promises to resolve before proceeding
+        const [expenses, unsettledList] = await Promise.all([
+            expenseService.getExpenseList(group.expensesList),
+            transactionService.getUnsettledList(group.unsettled)
+        ]);
+
+        groupData.expenseList = expenses;
+        groupData.unsettled = unsettledList;
+
+        console.log(groupData); // Now you'll see full data
+        return groupData;
     } catch (err) {
         console.error(err);
         return false;
     }
 }
+
 
 function generateGroupCode() {
     console.log("Generating group code")

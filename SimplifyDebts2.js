@@ -49,15 +49,16 @@ function simplifyDebts(transactions) {
 
 // Example usage:
 let transactions = [
-    ['Charlie','Bob',30],
-    ['Gabe','David',10],
-    ['Fred','Bob',10],
-    ['Fred','Charlie',30],
-    ['Fred','David',10],
-    ['Fred','Ema',10],
-    ['Bob','Charlie',40],
-    ['Charlie','David',20],
-    ['David','Ema',50],
+    ['B','G',30],
+    ['B','F',10],
+    ['C','B',40],
+    ['C','F',30],
+    ['D','G',10],
+    ['D','C',20],
+    ['D','F',10],
+    ['E','D',50],
+    ['E','F',10],
+
 ];
 
 console.log(simplifyDebts(transactions));

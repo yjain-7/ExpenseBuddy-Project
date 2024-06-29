@@ -1,7 +1,9 @@
 const Expense = require('../models/Expense');
 const Debt = require('../models/Debt');
+const Transaction = require('../models/Transaction')
 const simplify = require('../utils/Simplify')
 const debtsService = require('./UserDebtsService')
+const userService = require('./UserService')
 const ObjectId = require('mongoose').Types.ObjectId;
 exports.createExpense = async (req) => {
     try {
@@ -24,11 +26,11 @@ exports.createExpense = async (req) => {
         });
 
         const expense = await newExpense.save();
-        
-        if(expense){
+
+        if (expense) {
             console.log("Expense saved")
             return expense
-        }else{
+        } else {
             console.log("Expense not saved")
             return null;
         }
@@ -40,14 +42,14 @@ exports.createExpense = async (req) => {
 
 exports.simplify = async (unsettled) => {
     let transactions = [];
-    
+    console.log("IN simplify service")
     for (const trans of unsettled) {
         try {
             console.log(trans);
-            let transaction = await Debt.findById(trans);
-            if (transaction) { 
+            let transaction = await Transaction.findById(trans);
+            if (transaction) {
                 transactions.push({
-                    giver: transaction.paidBy.toString(), 
+                    giver: transaction.paidBy.toString(),
                     receiver: transaction.owedBy.toString(),
                     amount: transaction.amount
                 });
@@ -56,8 +58,39 @@ exports.simplify = async (unsettled) => {
             console.error(`Error fetching transaction with ID ${trans}:`, error);
         }
     }
-    
+
     console.log(transactions);
     let simplified = simplify.simplifyDebts(transactions);
     console.log(simplified);
 };
+
+exports.getExpenseList = async (expenseList) => {
+    let expenses = [];
+    for (const expenseid of expenseList) {
+        try {
+            let expense = await Expense.findById(expenseid);
+            if (expense) {
+                const [paidBy, debts, createdBy] = await Promise.all([
+                    userService.getUserInfo(expense.paidBy),
+                    debtsService.getDebtInfo(expense.debts),
+                    userService.getUserInfo(expense.createdBy),
+
+                ]);
+
+                expenses.push({
+                    _id: expense._id,
+                    description: expense.description,
+                    amount: expense.totalAmount,
+                    createdBy: createdBy.firstName,
+                    paidBy: paidBy.firstName,
+                    debts: debts,
+                    date: expense.date,
+                });
+            }
+        } catch (err) {
+            console.log("Error Extracting expense " + err)
+        }
+
+    }
+    return expenses
+}

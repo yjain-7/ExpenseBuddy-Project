@@ -1,6 +1,6 @@
 const Debt = require('../models/Debt')
-
-exports.createDebt = async(debts, paidBy) => {
+const userService = require('./UserService')
+exports.createDebt = async (debts, paidBy) => {
     console.log(debts)
     console.log(paidBy)
 
@@ -18,4 +18,25 @@ exports.createDebt = async(debts, paidBy) => {
         debtIds.push(savedDebt._id);
     }
     return debtIds;
+}
+
+
+exports.getDebtInfo = async (debtsIdList) => {
+    let debtInfo = []
+
+    try {
+        for (const id of debtsIdList) {
+            const { owedBy, amount } = await Debt.findById(id);
+            const user = await userService.getUserInfo(owedBy)
+            // console.log(user)
+            debtInfo.push({
+                owedBy: user.firstName,
+                amount,
+            });
+        }
+
+    } catch (err) {
+        console.log("Error retriving debt info " + err)
+    }
+    return debtInfo
 }

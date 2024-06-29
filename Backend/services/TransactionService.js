@@ -2,10 +2,11 @@ const mongoose = require('mongoose');
 const Transaction = require('../models/Transaction');
 const User = require('../models/User')
 const ObjectId = mongoose.Types.ObjectId;
-// group.unsettled, debts, paidBy
+const userService = require('./UserService')
+
 exports.addUnsettled = async (unsettled, debts, paidBy) => {
     console.log(debts)
-    
+
     if (unsettled.length === 0) {
         for (const debt of debts) {
             if (debt.owedBy === paidBy) {
@@ -68,13 +69,13 @@ async function saveTransaction(unsettled, debt, paidBy) {
     }
 }
 
-async function inverseTransaction(unsettled, debt, transactionInverse,paidBy) {
+async function inverseTransaction(unsettled, debt, transactionInverse, paidBy) {
     const newAmount = Math.abs(debt.amount - transactionInverse.amount);
-    if(newAmount == 0){
+    if (newAmount == 0) {
         unsettled = unsettled.filter(id => id !== transactionInverse._id);
         await Transaction.deleteOne(transactionInverse)
     }
-    if(debt.amount > transactionInverse.amount) {
+    if (debt.amount > transactionInverse.amount) {
         const transaction = new Transaction({
             paidBy: paidBy,
             owedBy: debt.owedBy,
@@ -92,3 +93,28 @@ async function inverseTransaction(unsettled, debt, transactionInverse,paidBy) {
     }
 }
 
+exports.getUnsettledList = async (unsettled) => {
+    let unsettledList = []
+    try {
+        for (const id in unsettled) {
+            const transaction = await Transaction.findById(unsettled[id]);
+            const [paidBy, owedBy] = await Promise.all([
+                userService.getUserInfo(transaction.paidBy),
+                userService.getUserInfo(transaction.owedBy),
+            ])
+            unsettledList.push({
+                id: transaction._id,
+                paidBy: paidBy.firstName,
+                owedBy: owedBy.firstName,
+                amount: transaction.amount
+            });
+        }
+
+        return unsettledList
+
+    }
+    catch (err) {
+        console.log(err)
+        return null;
+    }
+}

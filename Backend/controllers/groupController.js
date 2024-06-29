@@ -18,8 +18,8 @@ exports.joinGroup = async (req, res) => {
         const userId = req.userId;
         const { groupCode } = req.body;
         const group = await groupService.joinGroup(userId, groupCode);
-        if(group == null){
-            res.status().json({message : "Error joining group, groupfull"})
+        if (group == null) {
+            res.status().json({ message: "Error joining group, groupfull" })
         }
         res.status(200).json({ message: "Group Joined Successfully", groupData: group });
     } catch (err) {
@@ -27,23 +27,23 @@ exports.joinGroup = async (req, res) => {
         res.status(500).json({ message: "Server error" });
     }
 };
-exports.getGroup = async(req, res) =>{
-    try{
+exports.getGroup = async (req, res) => {
+    try {
         const groupCode = req.body.groupCode
         console.log(groupCode)
         const group = await groupService.getGroup(groupCode)
-        res.status(200).json({group})
+        res.status(200).json({ group })
     }
-    catch(err){
+    catch (err) {
         console.error(err)
-        res.status(500).json({message: "Server error"})
+        res.status(500).json({ message: "Server error" })
     }
 }
-exports.getGroups = async(req, res)=>{
-    try{
-      const groups = await groupService.getAllGroups();
-      res.status(200).json({ message: "Groups fetched successfully", groups: groups });
-    }catch(err){
+exports.getGroups = async (req, res) => {
+    try {
+        const groups = await groupService.getAllGroups();
+        res.status(200).json({ message: "Groups fetched successfully", groups: groups });
+    } catch (err) {
         console.log(err);
         res.status(500).json({ message: "Server error" });
     }

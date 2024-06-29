@@ -26,19 +26,19 @@ exports.login = async (req, res) => {
     console.log(result)
     const userData = getUserData(result);
     userData.token = result.token
-    res.status(200).send({userInfo : userData, message : "Login Successfullly"});
+    res.status(200).send({ userInfo: userData, message: "Login Successfullly" });
   } catch (err) {
     console.error(err);
     res.status(500).send({ message: 'Login Error' });
   }
 }
 
-function getUserData(result){
+function getUserData(result) {
   const user = {
-    id : result.id,
+    id: result.id,
     firstName: result.firstName,
-    lastName : result.lastName,
-    groupList : result.groupsList
+    lastName: result.lastName,
+    groupList: result.groupsList
   }
   console.log(user)
   return user
