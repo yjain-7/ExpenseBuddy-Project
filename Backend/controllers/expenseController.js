@@ -7,7 +7,8 @@ exports.addExpense = async (req, res) => {
         console.log(req.body)
         const { groupCode, debts, paidBy } = req.body
 
-        const group = await Group.findOne({ groupCode: groupCode });
+        const group = groupService.getGroupObject(groupCode)
+
         if (!group) {
             return res.status(404).json({ message: "Group not found" });
         }
@@ -39,7 +40,7 @@ exports.simplify = async (req, res) => {
     try {
         console.log("In simplifyController")
         const groupCode = req.body.groupCode;
-        const group = await Group.findOne({ groupCode: groupCode });
+        const group = await groupService.getGroupObject(groupCode)
         console.log(group.unsettled)
         const newUnsettled = expenseService.simplify(group.unsettled);
         group.unsettled = newUnsettled

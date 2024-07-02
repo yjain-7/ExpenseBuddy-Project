@@ -96,7 +96,8 @@ exports.addExpense = async (groupId, debts, paidBy, expense) => {
 
 exports.getGroup = async (groupCode) => {
     try {
-        let group = await Group.findOne({ groupCode });
+        let group = await this.getGroupObject(groupCode);
+        console.log(group)
         let groupData = {
             name: group.name,
             description: group.description,
@@ -104,6 +105,8 @@ exports.getGroup = async (groupCode) => {
             createdBy: group.createdBy,
             usersList: group.usersList,
         };
+
+        console.log(group.expensesList)
 
         // Await both promises to resolve before proceeding
         const [expenses, unsettledList] = await Promise.all([
@@ -122,6 +125,14 @@ exports.getGroup = async (groupCode) => {
     }
 }
 
+exports.getGroupObject = async(groupCode)=>{
+    try{
+        let group = await Group.findOne({ groupCode });
+        return group
+    }catch(err){
+        console.error("Error getting group form db: " +err);
+    }
+}
 
 function generateGroupCode() {
     console.log("Generating group code")

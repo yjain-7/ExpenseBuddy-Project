@@ -5,7 +5,9 @@ exports.createGroup = async (req, res) => {
     try {
         const userId = req.userId;
         const { name, description } = req.body;
+        // const group = await Group.findOne({ groupCode: groupCode });
         const group = await groupService.createGroup(userId, name, description);
+        
         res.status(200).json({ message: "Group Created Successfully", groupData: group });
     } catch (err) {
         console.error(err);

@@ -65,6 +65,7 @@ exports.simplify = async (unsettled) => {
 };
 
 exports.getExpenseList = async (expenseList) => {
+    console.log(expenseList)
     let expenses = [];
     for (const expenseid of expenseList) {
         try {
