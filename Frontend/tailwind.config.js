@@ -5,10 +5,11 @@ export default {
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
-    extend: {},
-    colors:{
-      logo : 'rgb(175, 238, 218)'
-    }
+    extend: {
+      colors: {
+        logo: "#b3efdc",
+      },
+    },
   },
   plugins: [],
 }

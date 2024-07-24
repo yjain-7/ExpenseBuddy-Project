@@ -32,7 +32,7 @@ exports.joinGroup = async (req, res) => {
 exports.getGroup = async (req, res) => {
     try {
         const groupCode = req.body.groupCode
-        console.log(groupCode)
+        console.log("GroupCode: "+groupCode)
         const group = await groupService.getGroup(groupCode)
         res.status(200).json({ group })
     }

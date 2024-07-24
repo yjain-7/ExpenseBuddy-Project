@@ -20,7 +20,7 @@ exports.createGroup = async (userId, name, description) => {
         // Update user with the new group ID
         newGroup.usersList.push({ userId: userId, name: user.firstName });
         const group = await newGroup.save();
-        user.groupsList.push({ groupId: group._id, name: group.name, groupCode: group.groupCode });
+        user.groupsList.push({ groupId: group._id, name: group.name, description: group.description, groupCode: group.groupCode });
         await user.save();
         return group
     } catch (err) {
@@ -50,7 +50,7 @@ exports.joinGroup = async (userId, groupCode) => {
         }
         group.usersList.push({ userId: userId, name: user.firstName });
         await group.save();
-        user.groupsList.push({ groupId: group._id, name: group.name, groupCode: group.groupCode });
+        user.groupsList.push({ groupId: group._id, name: group.name,  description: group.description, groupCode: group.groupCode });
         await user.save();
 
         return this.getGroup(groupCode);
@@ -99,14 +99,15 @@ exports.getGroup = async (groupCode) => {
         let group = await this.getGroupObject(groupCode);
         console.log(group)
         let groupData = {
-            name: group.name,
-            description: group.description,
-            groupCode: groupCode,
-            createdBy: group.createdBy,
-            usersList: group.usersList,
+            name: group?.name ?? 'Default Name', // Fallback value if `group.name` is null or undefined
+            description: group?.description ?? 'No description provided', // Fallback value if `group.description` is null or undefined
+            groupCode: groupCode ?? 'Unknown Group Code', // Fallback value if `groupCode` is null or undefined
+            createdBy: group?.createdBy ?? 'Unknown Creator', // Fallback value if `group.createdBy` is null or undefined
+            usersList: group?.usersList ?? [] // Fallback value if `group.usersList` is null or undefined
         };
+        
 
-        console.log(group.expensesList)
+        console.log(group?.expensesList??[])
 
         // Await both promises to resolve before proceeding
         const [expenses, unsettledList] = await Promise.all([

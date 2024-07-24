@@ -6,7 +6,7 @@ const { verify } = require('jsonwebtoken');
 // Define routes
 groupRouter.post('/createGroup',verifyToken,  groupController.createGroup);
 groupRouter.post('/joinGroup', verifyToken, groupController.joinGroup);
-groupRouter.get('/getGroup', verifyToken, groupController.getGroup);
+groupRouter.post('/getGroup', verifyToken, groupController.getGroup);
 
 groupRouter.get('/getGroups', verifyToken, groupController.getGroups);
 
