@@ -3,6 +3,8 @@ const Group = require('../models/Group')
 const transactionService = require('./TransactionService');
 const expenseService = require('./ExpenseService')
 const userService = require('./UserService')
+const groupService = require('../services/GroupService')
+
 exports.createGroup = async (userId, name, description) => {
     try {
         const groupCode = generateGroupCode();
@@ -72,14 +74,14 @@ exports.getAllGroups = async () => {
     }
 }
 
-exports.addExpense = async (groupId, debts, paidBy, expense) => {
+exports.addExpense = async (groupCode, debts, paidBy, expense) => {
     try {
-        console.log(groupId)
-        const group = await Group.findById(groupId);
+        console.log(groupCode)
+        const group = await groupService.getGroupObject(groupCode)
         if (!group) {
             throw new Error("Group not found");
         }
-        group.expensesList.push(expense._id);
+        group.expensesList.unshift(expense._id);
         const unsettled = await transactionService.addUnsettled(group.unsettled, debts, paidBy);
         if (!unsettled) {
             return false;

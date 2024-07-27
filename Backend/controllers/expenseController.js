@@ -14,7 +14,7 @@ exports.addExpense = async (req, res) => {
         }
 
         req.groupId = group._id;
-
+        console.log(req.groupId)
         const expense = await expenseService.createExpense(req);
         console.log(expense)
 
@@ -24,7 +24,7 @@ exports.addExpense = async (req, res) => {
 
         console.log(debts)
 
-        const unsettled = await groupService.addExpense(req.groupId, debts, paidBy, expense);
+        const unsettled = await groupService.addExpense(groupCode, debts, paidBy, expense);
         if (!unsettled) {
             return res.status(500).json({ message: "Failed to add expense to group" });
         }

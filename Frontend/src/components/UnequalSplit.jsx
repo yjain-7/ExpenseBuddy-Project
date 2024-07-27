@@ -21,18 +21,22 @@ export default function UnequalSplit({ users, onUnequalSplitChange, amount }) {
     }));
   };
 
+  const approximatelyEqual = (a, b, tolerance = 0.01) => {
+    return Math.abs(a - b) < tolerance;
+  };
+
   useEffect(() => {
     const totalAmount = selectedUsers.reduce(
       (sum, userId) => sum + (userAmounts[userId] || 0),
       0
     );
-    setIsAmountValid(totalAmount === amount);
+    setIsAmountValid(approximatelyEqual(totalAmount, amount));
   }, [selectedUsers, userAmounts, amount]);
 
   const handleSplitChange = () => {
     if (isAmountValid) {
       const selectedUserAmounts = selectedUsers.map((userId) => ({
-        userId,
+        owedBy: userId,
         amount: userAmounts[userId] || 0,
       }));
       onUnequalSplitChange(selectedUserAmounts);

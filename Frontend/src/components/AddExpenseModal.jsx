@@ -5,18 +5,49 @@ import UserDropdown from "./UserDropdown";
 import EqualSplit from "./EqualSplit";
 import UnequalSplit from "./UnequalSplit";
 
-export default function AddExpenseModal({ auth, onClose, usersList }) {
-  const [title, setTitle] = useState("Movie Tickets");
-  const [error, setError] = useState(null);
-  const [amount, setAmount] = useState(1000);
+export default function AddExpenseModal({ auth, onClose, usersList, groupCode }) {
+  const [title, setTitle] = useState("");
+  const [amount, setAmount] = useState(100);
   const [selectedUserId, setSelectedUserId] = useState(null);
-  const [description, setDescription] = useState(
-    "Movie tickets for Deadpool and Wolverine"
-  );
+  const [description, setDescription] = useState("");
   const [splitType, setSplitType] = useState("equal");
   const [splitData, setSplitData] = useState(null);
-
+  const [error, setError] = useState(null);
+  const [debts, setDebts] = useState(null);
   const navigate = useNavigate();
+  const submitExpense = async () => {
+    try {
+      const url = "http://localhost:3000/api/expenses/addExpense";
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          Authorization: auth,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          title: title,
+          description: description,
+          paidBy: selectedUserId,
+          totalAmount: amount,
+          groupCode: groupCode,
+          debts: splitData.users,
+        }),
+      });
+      
+      const data = await response.json();
+      
+      if (!response.ok) {
+        alert(data.message);
+      } else {
+        alert(data.message);
+        onClose();
+      }
+    } catch (e) {
+      console.log(e.message);
+      setError("An error occurred while adding the expense. Please try again.");
+    }
+  };
+
 
   const handleUserSelected = (userId) => {
     setSelectedUserId(userId);
@@ -27,7 +58,7 @@ export default function AddExpenseModal({ auth, onClose, usersList }) {
     setSplitData({
       type: "equal",
       users: selectedUsers,
-      amount: amount / selectedUsers.length,
+      // amount: amount / selectedUsers.length,
     });
     console.log("Inside Equal Split " + JSON.stringify(selectedUsers));
   };
@@ -38,7 +69,7 @@ export default function AddExpenseModal({ auth, onClose, usersList }) {
       users: selectedUserAmounts,
     });
 
-    console.log(selectedUserAmounts);
+    console.log("Inside Unequal split: "+JSON.stringify(selectedUserAmounts));
   };
 
   const handleSubmit = (e) => {
@@ -131,6 +162,7 @@ export default function AddExpenseModal({ auth, onClose, usersList }) {
             <button
               type="submit"
               className="mt-4 w-full flex items-center justify-center gap-2 px-5 py-3 font-medium rounded-md bg-black text-white"
+              onClick={submitExpense}
             >
               Add Expense
             </button>

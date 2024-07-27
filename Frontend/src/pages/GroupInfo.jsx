@@ -3,6 +3,7 @@ import ExpenseCard from "../components/ExpenseCard";
 import UnsettledCard from "../components/UnsettledCard";
 import { useLocation } from "react-router-dom";
 import AddExpenseModal from "../components/AddExpenseModal";
+
 export const GroupInfo = () => {
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
@@ -17,16 +18,21 @@ export const GroupInfo = () => {
   const [showUsers, setShowUsers] = useState(false);
   const [expenseModal, setExpenseModal] = useState(false);
   const token = localStorage.getItem("authToken");
-  console.log(usersList)
+
   const openModal = () => {
     setExpenseModal(true);
   };
+
+  const closeModal = () => {
+    setExpenseModal(false);
+  };
+
   if (!name || !description || !groupCode || !createdBy) {
     return <div>No group information available.</div>;
   }
 
   return (
-    <div className="h-screen overflow-hidden">
+    <div className="h-screen overflow-hidden relative">
       <div className="p-4 bg-white shadow-lg rounded-lg">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="flex flex-col space-y-2">
@@ -44,7 +50,6 @@ export const GroupInfo = () => {
               className="pt-5 flex justify-center items-center gap-6 "
               text="Add Expense"
             />
-            {expenseModal && <AddExpenseModal auth ={token} onClose={()=> setExpenseModal(false)} usersList={usersList}/>}
           </div>
         </div>
       </div>
@@ -60,7 +65,7 @@ export const GroupInfo = () => {
               <p>No users found.</p>
             )}
           </div>
-          <div>Activites tab</div>
+          <div>Activities tab</div>
         </div>
         <div className="overflow-y-auto p-2">
           {expenseList.length > 0 ? (
@@ -81,6 +86,15 @@ export const GroupInfo = () => {
           )}
         </div>
       </div>
+
+      {expenseModal && (
+        <>
+          <div className="fixed inset-0 bg-black bg-opacity-50 z-40" onClick={closeModal}></div>
+          <div className="fixed inset-0 flex items-center justify-center z-50">
+            <AddExpenseModal auth={token} onClose={closeModal} usersList={usersList} groupCode={groupCode} />
+          </div>
+        </>
+      )}
     </div>
   );
 };
