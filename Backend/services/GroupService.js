@@ -22,7 +22,7 @@ exports.createGroup = async (userId, name, description) => {
         const group = await newGroup.save();
         user.groupsList.push({ groupId: group._id, name: group.name, description: group.description, groupCode: group.groupCode });
         await user.save();
-        return group
+        return user
     } catch (err) {
         console.error(err);
         throw new Error("Error creating group");
@@ -53,7 +53,7 @@ exports.joinGroup = async (userId, groupCode) => {
         user.groupsList.push({ groupId: group._id, name: group.name,  description: group.description, groupCode: group.groupCode });
         await user.save();
 
-        return this.getGroup(groupCode);
+        return user
     } catch (err) {
         console.error(err);
         throw new Error("Error joining group");
@@ -143,11 +143,12 @@ function generateGroupCode() {
     for (let i = 0; i < 6; i++) {
         groupCode += charset.charAt(Math.floor(Math.random() * charsetLength));
     }
+    console.log(groupCode)
     return groupCode;
 }
 
 function userAlreadyExist(group, userId) {
-    return group.usersList.includes(userId);
+    return group.usersList.some(user => user.userId.toString() === userId.toString());
 }
 
 

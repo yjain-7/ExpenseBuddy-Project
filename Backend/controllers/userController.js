@@ -38,7 +38,7 @@ function getUserData(result) {
     id: result.id,
     firstName: result.firstName,
     lastName: result.lastName,
-    groupList: result.groupsList
+    groupsList: result.groupsList
   }
   console.log(user)
   return user

@@ -1,20 +1,26 @@
-import React from "react";
+import { useState } from "react";
 import ExpenseCard from "../components/ExpenseCard";
 import UnsettledCard from "../components/UnsettledCard";
 import { useLocation } from "react-router-dom";
-
+import AddExpenseModal from "../components/AddExpenseModal";
 export const GroupInfo = () => {
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
 
-  const name = searchParams.get('name');
-  const description = searchParams.get('description');
-  const groupCode = searchParams.get('groupCode');
-  const createdBy = searchParams.get('createdBy');
-  const usersList = JSON.parse(searchParams.get('usersList') || '[]');
-  const expenseList = JSON.parse(searchParams.get('expenseList') || '[]');
-  const unsettled = JSON.parse(searchParams.get('unsettled') || '[]');
-
+  const name = searchParams.get("name");
+  const description = searchParams.get("description");
+  const groupCode = searchParams.get("groupCode");
+  const createdBy = searchParams.get("createdBy");
+  const usersList = JSON.parse(searchParams.get("usersList") || "[]");
+  const expenseList = JSON.parse(searchParams.get("expenseList") || "[]");
+  const unsettled = JSON.parse(searchParams.get("unsettled") || "[]");
+  const [showUsers, setShowUsers] = useState(false);
+  const [expenseModal, setExpenseModal] = useState(false);
+  const token = localStorage.getItem("authToken");
+  console.log(usersList)
+  const openModal = () => {
+    setExpenseModal(true);
+  };
   if (!name || !description || !groupCode || !createdBy) {
     return <div>No group information available.</div>;
   }
@@ -31,19 +37,30 @@ export const GroupInfo = () => {
             </h2>
             <p className="text-gray-600">Created By: {createdBy}</p>
           </div>
-          <div>Pending Transaction Section user related</div>
+          <div className="flex flex-col">
+            <div>Pending Transaction Section user related</div>
+            <Button
+              onClick={openModal}
+              className="pt-5 flex justify-center items-center gap-6 "
+              text="Add Expense"
+            />
+            {expenseModal && <AddExpenseModal auth ={token} onClose={()=> setExpenseModal(false)} usersList={usersList}/>}
+          </div>
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-4 h-[calc(100%-120px)]">
-        <div className="hidden md:block overflow-y-auto p-2">
-          {usersList.length > 0 ? (
-            usersList.map((userData) => (
-              <UserListCard key={userData.userId} name={userData.name} />
-            ))
-          ) : (
-            <p>No users found.</p>
-          )}
+        <div className="hidden md:block overflow-y-auto p-2 flex flex-col">
+          <div>
+            {usersList.length > 0 ? (
+              usersList.map((userData) => (
+                <UserListCard key={userData.userId} name={userData.name} />
+              ))
+            ) : (
+              <p>No users found.</p>
+            )}
+          </div>
+          <div>Activites tab</div>
         </div>
         <div className="overflow-y-auto p-2">
           {expenseList.length > 0 ? (
@@ -73,6 +90,17 @@ function UserListCard({ name }) {
     <div className="border rounded-lg p-4 mb-4 shadow-md">
       <p className="text-lg font-semibold">{name}</p>
     </div>
+  );
+}
+
+function Button({ onClick, text }) {
+  return (
+    <button
+      onClick={onClick}
+      className="bg-logo px-4 py-2 rounded-lg font-semibold text-lg"
+    >
+      {text}
+    </button>
   );
 }
 

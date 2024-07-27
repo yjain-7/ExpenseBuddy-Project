@@ -9,20 +9,6 @@ export default function Login() {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  const handleInputChange = (event) => {
-    const { name, value } = event.target;
-    switch (name) {
-      case "email":
-        setEmail(value);
-        break;
-      case "password":
-        setPassword(value);
-        break;
-      default:
-        break;
-    }
-  };
-
   const handleSubmit = async (event) => {
     event.preventDefault();
 
@@ -48,7 +34,10 @@ export default function Login() {
 
       const data = await response.json();
       const userInfo = data.userInfo;
-      navigate("/groups", { state: { userInfo } });
+
+      localStorage.setItem("authToken", userInfo.token);
+
+      navigate("/userInfo", { state: { userInfo } });
     } catch (error) {
       setError(error.message);
     }
@@ -58,9 +47,14 @@ export default function Login() {
     <div className="grid grid-cols-1 md:grid-cols-2">
       <div className="flex items-center justify-center min-h-screen">
         <form onSubmit={handleSubmit}>
-          <div className="flex justify-center text-2xl font-extrabold text-gray-700 mb-1 pb-3">Login Page</div>
-          <div className="flex justify-center pb-2 font-semibold">Don't have an account?
-            <NavLink to="/signup" className="px-2 underline">SignUp</NavLink>
+          <div className="flex justify-center text-2xl font-extrabold text-gray-700 mb-1 pb-3">
+            Login Page
+          </div>
+          <div className="flex justify-center pb-2 font-semibold">
+            Don't have an account?
+            <NavLink to="/signup" className="px-2 underline">
+              SignUp
+            </NavLink>
           </div>
           <InputField
             header="Email Address"
@@ -68,7 +62,7 @@ export default function Login() {
             type="email"
             name="email"
             value={email}
-            onChange={handleInputChange}
+            onChange={(e) => setEmail(e.target.value)}
           />
           <InputField
             header="Password"
@@ -76,10 +70,15 @@ export default function Login() {
             type="password"
             name="password"
             value={password}
-            onChange={handleInputChange}
+            onChange={(e) => setPassword(e.target.value)}
           />
           {error && <p className="text-red-500">{error}</p>}
-          <button type="submit" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Submit</button>
+          <button
+            type="submit"
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          >
+            Submit
+          </button>
         </form>
       </div>
       <div className="hidden md:block">

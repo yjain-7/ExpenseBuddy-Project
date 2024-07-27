@@ -1,0 +1,16 @@
+{
+  "title": "dummy",
+  "totalAmount": 70,
+  "description": "3",
+  "paidBy": "{{user5}}",
+  "groupCode": "^E%^B3",
+  "debts": [
+    {
+      "owedBy": "{{user4}}",
+      "amount": 50
+    },{
+      "owedBy": "{{user6}}",
+      "amount": 10
+    }
+  ]
+}

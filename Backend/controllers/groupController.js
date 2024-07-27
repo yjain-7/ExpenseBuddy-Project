@@ -6,9 +6,9 @@ exports.createGroup = async (req, res) => {
         const userId = req.userId;
         const { name, description } = req.body;
         // const group = await Group.findOne({ groupCode: groupCode });
-        const group = await groupService.createGroup(userId, name, description);
+        const userInfo = await groupService.createGroup(userId, name, description);
         
-        res.status(200).json({ message: "Group Created Successfully", groupData: group });
+        res.status(200).json({ message: "Group Created Successfully", userInfo: userInfo, token: userInfo.token });
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: "Server error" });
@@ -19,11 +19,11 @@ exports.joinGroup = async (req, res) => {
     try {
         const userId = req.userId;
         const { groupCode } = req.body;
-        const group = await groupService.joinGroup(userId, groupCode);
-        if (group == null) {
+        const userInfo = await groupService.joinGroup(userId, groupCode);
+        if (userInfo == null) {
             res.status().json({ message: "Error joining group, groupfull" })
         }
-        res.status(200).json({ message: "Group Joined Successfully", groupData: group });
+        res.status(200).json({ message: "Group Joined Successfully", userInfo: userInfo, token: userInfo.token });
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: "Server error" });

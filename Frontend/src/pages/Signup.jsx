@@ -9,6 +9,7 @@ export default function Signup() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
+  const [successMessage, setSuccessMessage] = useState(""); // Add state for success message
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
@@ -30,10 +31,44 @@ export default function Signup() {
     }
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
+
     // Form validation logic here, setting error if needed
-    setError("Invalid form submission"); // Example error
+    if (!email || !password || !firstName) {
+      setError("All fields are required except last name.");
+      return;
+    }
+
+    const data = {
+      email,
+      password,
+      firstName,
+      lastName,
+    };
+
+    try {
+      const response = await fetch('http://localhost:3000/api/users/signUp', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      const result = await response.json();
+      const userInfo = result.userInfo; // Adjust this according to your API response
+      console.log(userInfo);
+      setSuccessMessage("Account created successfully! Now you can log in."); // Set success message
+      setError(null); // Clear any previous errors
+    } catch (error) {
+      setError('Failed to sign up. Please try again.');
+      console.error('Error:', error);
+    }
   };
 
   return (
@@ -83,6 +118,11 @@ export default function Signup() {
             onChange={handleInputChange}
           />
           {error && <p className="text-red-500">{error}</p>}
+          {successMessage && (
+            <div className="p-4 mb-4 text-green-700 bg-green-100 rounded-lg dark:bg-green-200 dark:text-green-800">
+              {successMessage}
+            </div>
+          )}
           <button
             type="submit"
             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"

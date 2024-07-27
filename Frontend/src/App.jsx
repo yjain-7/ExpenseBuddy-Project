@@ -2,8 +2,8 @@ import React from 'react';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
-import Group from './pages/Group';
 import GroupInfo from './pages/GroupInfo';
+import UserInfo from './pages/UserInfo';
 
 function App() {
   const router = createBrowserRouter([
@@ -16,8 +16,8 @@ function App() {
       element: <Signup />,
     },
     {
-      path: '/groups',
-      element: <Group />,
+      path: '/userInfo',
+      element: <UserInfo />,
     },
     {
       path: '/groupInfo',
