@@ -39,13 +39,19 @@ To install Expense-Buddy, follow these steps:
     cd expense-buddy
     ```
 3. Install the required dependencies:
+   In both frontend and Backend folder
     ```bash
     npm install
     ```
-4. Run Backend
+4. Run Backend 
    ```bash
     node app.js
     ```
+5. Run Backend
+   ```bash
+   npm run dev
+    ```
+
 ## Usage
 
 1. Create a group and add users.
