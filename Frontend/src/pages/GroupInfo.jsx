@@ -20,6 +20,8 @@ export const GroupInfo = () => {
     JSON.parse(searchParams.get("unsettled") || "[]")
   );
   const [showUsers, setShowUsers] = useState(false);
+  const [showExpenses, setShowExpenses] = useState(true); // Default to show expenses
+  const [showUnsettled, setShowUnsettled] = useState(false);
   const [expenseModal, setExpenseModal] = useState(false);
   const token = localStorage.getItem("authToken");
 
@@ -34,6 +36,24 @@ export const GroupInfo = () => {
   if (!name || !description || !groupCode || !createdBy) {
     return <div>No group information available.</div>;
   }
+
+  const toggleUsers = () => {
+    setShowUsers(true);
+    setShowExpenses(false);
+    setShowUnsettled(false);
+  };
+
+  const toggleExpenses = () => {
+    setShowUsers(false);
+    setShowExpenses(true);
+    setShowUnsettled(false);
+  };
+
+  const toggleUnsettled = () => {
+    setShowUsers(false);
+    setShowExpenses(false);
+    setShowUnsettled(true);
+  };
 
   return (
     <div className="h-screen overflow-hidden relative">
@@ -57,19 +77,40 @@ export const GroupInfo = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-4 h-[calc(100%-120px)]">
-        <div className="hidden md:block overflow-y-auto p-2 flex flex-col">
-          <div>
-            {usersList.length > 0 ? (
-              usersList.map((userData) => (
-                <UserListCard key={userData.userId} name={userData.name} />
-              ))
-            ) : (
-              <p>No users found.</p>
-            )}
-          </div>
-          <div>Activities tab</div>
+      {/* Mobile Headers */}
+      <div className="md:hidden flex justify-around my-4">
+        <button
+          className={`flex-1 text-center py-2 ${showUsers ? 'bg-gray-200' : 'bg-white'} rounded`}
+          onClick={toggleUsers}
+        >
+          User List
+        </button>
+        <button
+          className={`flex-1 text-center py-2 ${showExpenses ? 'bg-gray-200' : 'bg-white'} rounded`}
+          onClick={toggleExpenses}
+        >
+          Expense List
+        </button>
+        <button
+          className={`flex-1 text-center py-2 ${showUnsettled ? 'bg-gray-200' : 'bg-white'} rounded`}
+          onClick={toggleUnsettled}
+        >
+          Unsettled List
+        </button>
+      </div>
+
+      {/* Content Sections */}
+      <div className="hidden md:grid md:grid-cols-3 gap-3 mt-4 h-[calc(100%-120px)]">
+        <div className="overflow-y-auto p-2">
+          {usersList.length > 0 ? (
+            usersList.map((userData) => (
+              <UserListCard key={userData.userId} name={userData.name} />
+            ))
+          ) : (
+            <p>No users found.</p>
+          )}
         </div>
+
         <div className="overflow-y-auto p-2">
           {expenseList.length > 0 ? (
             expenseList.map((expense) => (
@@ -79,6 +120,7 @@ export const GroupInfo = () => {
             <p>No expenses found.</p>
           )}
         </div>
+
         <div className="overflow-y-auto p-2">
           {unsettled.length > 0 ? (
             unsettled.map((debt) => (
@@ -88,6 +130,45 @@ export const GroupInfo = () => {
             <p>No settlements found.</p>
           )}
         </div>
+      </div>
+
+      {/* Mobile Content Sections */}
+      <div className="md:hidden mt-4">
+        {showUsers && (
+          <div className="overflow-y-auto p-2">
+            {usersList.length > 0 ? (
+              usersList.map((userData) => (
+                <UserListCard key={userData.userId} name={userData.name} />
+              ))
+            ) : (
+              <p>No users found.</p>
+            )}
+          </div>
+        )}
+
+        {showExpenses && (
+          <div className="overflow-y-auto p-2">
+            {expenseList.length > 0 ? (
+              expenseList.map((expense) => (
+                <ExpenseCard key={expense._id} expense={expense} />
+              ))
+            ) : (
+              <p>No expenses found.</p>
+            )}
+          </div>
+        )}
+
+        {showUnsettled && (
+          <div className="overflow-y-auto p-2">
+            {unsettled.length > 0 ? (
+              unsettled.map((debt) => (
+                <UnsettledCard key={debt.id} unsettled={debt} />
+              ))
+            ) : (
+              <p>No settlements found.</p>
+            )}
+          </div>
+        )}
       </div>
 
       {expenseModal && (
