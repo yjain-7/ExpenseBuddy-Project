@@ -39,7 +39,7 @@ export const UserInfo = () => {
             />
           ))
         ) : (
-          <p>No groups found</p>
+          <div className="flex justify-center col-start-2 font-bold text-2xl">No groups found</div>
         )}
       </div>
       <div className="pt-5 flex justify-center items-center gap-6">

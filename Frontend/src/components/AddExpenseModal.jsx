@@ -7,13 +7,12 @@ import UnequalSplit from "./UnequalSplit";
 
 export default function AddExpenseModal({ auth, onClose, usersList, groupCode, setExpenseList, setUnsettled }) {
   const [title, setTitle] = useState("");
-  const [amount, setAmount] = useState(100);
+  const [amount, setAmount] = useState(0);
   const [selectedUserId, setSelectedUserId] = useState(null);
   const [description, setDescription] = useState("");
   const [splitType, setSplitType] = useState("equal");
   const [splitData, setSplitData] = useState(null);
   const [error, setError] = useState(null);
-  const [debts, setDebts] = useState(null);
   const navigate = useNavigate();
   const submitExpense = async () => {
     try {
@@ -61,7 +60,6 @@ export default function AddExpenseModal({ auth, onClose, usersList, groupCode, s
     setSplitData({
       type: "equal",
       users: selectedUsers,
-      // amount: amount / selectedUsers.length,
     });
     console.log("Inside Equal Split " + JSON.stringify(selectedUsers));
   };
@@ -116,7 +114,7 @@ export default function AddExpenseModal({ auth, onClose, usersList, groupCode, s
               required
               className="w-full px-4 py-3 border-gray-300 rounded-md mt-4"
               value={amount}
-              onChange={(e) => setAmount(e.target.value)}
+              onChange={(e) => setAmount(Number(e.target.value))}
             />
 
             <div className="mt-4">
