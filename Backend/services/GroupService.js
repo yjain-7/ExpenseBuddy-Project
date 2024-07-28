@@ -88,7 +88,7 @@ exports.addExpense = async (groupCode, debts, paidBy, expense) => {
         }
         group.unsettled = unsettled
         await group.save();
-        return unsettled;
+        return {unsettled:unsettled,expenseList:group.expensesList};
     } catch (error) {
         console.error(error);
         return false;

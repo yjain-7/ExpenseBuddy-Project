@@ -80,6 +80,7 @@ exports.getExpenseList = async (expenseList) => {
 
                 expenses.push({
                     _id: expense._id,
+                    title : expense.title,
                     description: expense.description,
                     amount: expense.totalAmount,
                     createdBy: createdBy.firstName,

@@ -5,7 +5,7 @@ import UserDropdown from "./UserDropdown";
 import EqualSplit from "./EqualSplit";
 import UnequalSplit from "./UnequalSplit";
 
-export default function AddExpenseModal({ auth, onClose, usersList, groupCode }) {
+export default function AddExpenseModal({ auth, onClose, usersList, groupCode, setExpenseList, setUnsettled }) {
   const [title, setTitle] = useState("");
   const [amount, setAmount] = useState(100);
   const [selectedUserId, setSelectedUserId] = useState(null);
@@ -38,8 +38,11 @@ export default function AddExpenseModal({ auth, onClose, usersList, groupCode })
       
       if (!response.ok) {
         alert(data.message);
+
       } else {
         alert(data.message);
+        setExpenseList(data.expenseList)
+        setUnsettled(data.unsettled)
         onClose();
       }
     } catch (e) {

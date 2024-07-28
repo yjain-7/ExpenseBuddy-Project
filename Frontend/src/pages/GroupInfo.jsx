@@ -13,8 +13,12 @@ export const GroupInfo = () => {
   const groupCode = searchParams.get("groupCode");
   const createdBy = searchParams.get("createdBy");
   const usersList = JSON.parse(searchParams.get("usersList") || "[]");
-  const expenseList = JSON.parse(searchParams.get("expenseList") || "[]");
-  const unsettled = JSON.parse(searchParams.get("unsettled") || "[]");
+  const [expenseList, setExpenseList] = useState(
+    JSON.parse(searchParams.get("expenseList") || "[]")
+  );
+  const [unsettled, setUnsettled] = useState(
+    JSON.parse(searchParams.get("unsettled") || "[]")
+  );
   const [showUsers, setShowUsers] = useState(false);
   const [expenseModal, setExpenseModal] = useState(false);
   const token = localStorage.getItem("authToken");
@@ -45,11 +49,10 @@ export const GroupInfo = () => {
           </div>
           <div className="flex flex-col">
             <div>Pending Transaction Section user related</div>
-            <Button
-              onClick={openModal}
-              className="pt-5 flex justify-center items-center gap-6 "
-              text="Add Expense"
-            />
+            <div className="flex flex-auto space-x-4 pt-5 justify-end items-end">
+              <Button onClick={openModal} text="Add Expense" />
+              <Button text="Simplify" />
+            </div>
           </div>
         </div>
       </div>
@@ -89,9 +92,19 @@ export const GroupInfo = () => {
 
       {expenseModal && (
         <>
-          <div className="fixed inset-0 bg-black bg-opacity-50 z-40" onClick={closeModal}></div>
+          <div
+            className="fixed inset-0 bg-black bg-opacity-50 z-40"
+            onClick={closeModal}
+          ></div>
           <div className="fixed inset-0 flex items-center justify-center z-50">
-            <AddExpenseModal auth={token} onClose={closeModal} usersList={usersList} groupCode={groupCode} />
+            <AddExpenseModal
+              auth={token}
+              onClose={closeModal}
+              usersList={usersList}
+              groupCode={groupCode}
+              setExpenseList={setExpenseList}
+              setUnsettled={setUnsettled}
+            />
           </div>
         </>
       )}
