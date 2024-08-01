@@ -18,7 +18,9 @@ export default function EqualSplit({ users, onEqualSplitChange, amount }) {
       return;
     }
 
-    const splitAmountPerUser = amount / selectedUsers.length;
+    // const splitAmountPerUser = amount / selectedUsers.length;
+    const splitAmountPerUser = parseFloat((amount / selectedUsers.length).toFixed(2));
+
 
     const splitData = selectedUsers.map((userId) => ({
       owedBy:userId,

@@ -10,7 +10,6 @@ exports.signUpUser = async ({ email, password, firstName, lastName }) => {
     const newUser = new User({ email, password, firstName, lastName });
     return await newUser.save();
   } catch (err) {
-    console.error(err);
     throw new Error('Error creating user');
   }
 }
@@ -23,28 +22,24 @@ exports.loginUser = async (email, password) => {
     }
     const userId = user._id;
     const token = JWT.getToken(email, userId);
-    return { id: user.id, firstName: user.firstName, lastName: user.lastName, groupsList: user.groupsList, token: token };
+    return { id: user.id, firstName: user.firstName, lastName: user.lastName, groupsList: user.groupsList, token };
   } catch (err) {
-    console.error(err);
     throw new Error('Login Error');
   }
 }
 
-
 exports.getUserInfo = async (userId) => {
   try {
-    const user = await User.findOne(userId);
+    const user = await User.findById(userId);
     if (!user) {
       throw new Error("User not found");
     }
-    const userData = {
+    return {
       id: userId,
       firstName: user.firstName,
       lastName: user.lastName
     };
-    return userData;
   } catch (err) {
-    console.error(err);
     throw new Error("Error retrieving user information");
   }
-};
+}
