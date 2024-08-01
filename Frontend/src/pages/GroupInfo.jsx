@@ -25,6 +25,32 @@ export const GroupInfo = () => {
   const [expenseModal, setExpenseModal] = useState(false);
   const token = localStorage.getItem("authToken");
 
+  const simplifyDebts = async() => {
+    try{
+      const url = "http://localhost:3000/api/expenses/simplify"
+      const response = await fetch(url,{
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': token
+        },
+        body:JSON.stringify({groupCode}),
+      });
+
+      const data = await response.json();
+      if(!response.ok){
+        alert(data.message)
+      }else{
+        setUnsettled(data.unsettled)
+        alert("Debt Simplify")
+      }
+    }catch(err){
+      alert("Error simplifying debts")
+      console.log(err)
+    }
+  }
+
+
   const openModal = () => {
     setExpenseModal(true);
   };
@@ -54,7 +80,7 @@ export const GroupInfo = () => {
     setShowExpenses(false);
     setShowUnsettled(true);
   };
-
+  
   return (
     <div className="h-screen overflow-hidden relative">
       <div className="p-4 bg-white shadow-lg rounded-lg">
@@ -71,7 +97,7 @@ export const GroupInfo = () => {
             <div>Pending Transaction Section user related</div>
             <div className="flex flex-auto space-x-4 pt-5 justify-end items-end">
               <Button onClick={openModal} text="Add Expense" />
-              <Button text="Simplify" />
+              <Button onClick={simplifyDebts} text="Simplify" />
             </div>
           </div>
         </div>

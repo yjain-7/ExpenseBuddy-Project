@@ -45,23 +45,20 @@ exports.simplify = async (unsettled) => {
     console.log("IN simplify service")
     for (const trans of unsettled) {
         try {
-            console.log(trans);
+            console.log("------------\n"+trans);
             let transaction = await Transaction.findById(trans);
             if (transaction) {
-                transactions.push({
-                    giver: transaction.paidBy.toString(),
-                    receiver: transaction.owedBy.toString(),
-                    amount: transaction.amount
-                });
+                transactions.push(transaction)
             }
         } catch (error) {
             console.error(`Error fetching transaction with ID ${trans}:`, error);
         }
     }
 
-    console.log(transactions);
+    console.log("Befor simplification\n"+JSON.stringify(transactions));
     let simplified = simplify.simplifyDebts(transactions);
-    console.log(simplified);
+    console.log("After simplification\n"+JSON.stringify(simplified));
+    return simplified
 };
 
 exports.getExpenseList = async (expenseList) => {

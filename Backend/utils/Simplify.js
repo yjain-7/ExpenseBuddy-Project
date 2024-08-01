@@ -1,48 +1,57 @@
-exports.simplifyDebts = async (transactions) => {
-    let total = {};
-    console.log("IN simplify detbs algo")
-    for (let transaction of transactions) {
-        let { giver, receiver, amount } = transaction;
-        if (!(giver in total)) total[giver] = 0;
-        if (!(receiver in total)) total[receiver] = 0;
-        total[giver] -= amount;
-        total[receiver] += amount;
+const Heap = require("heap");
+
+exports.simplifyDebts = (transactions) => {
+  let total = {};
+  for (let transaction of transactions) {
+    let { paidBy, owedBy, amount } = transaction;
+    if (!(paidBy in total)) total[paidBy] = 0;
+    if (!(owedBy in total)) total[owedBy] = 0;
+    total[paidBy] -= amount;
+    total[owedBy] += amount;
+  }
+
+  let creditHeap = new Heap((a, b) => b[0] - a[0]);
+  let debitHeap = new Heap((a, b) => a[0] - b[0]);
+
+  for (let name in total) {
+    let amount = total[name];
+    if (amount > 0) {
+      creditHeap.push([-amount, name]);
+    } else if (amount < 0) {
+      debitHeap.push([amount, name]);
     }
+  }
 
-    let credit = [];
-    let debit = [];
+  let answer = [];
 
-    for (let name in total) {
-        let amount = total[name];
-        if (amount > 0) {
-            credit.push([-amount, name]);
-        } else if (amount < 0) {
-            debit.push([amount, name]);
-        }
+  while (creditHeap.size() && debitHeap.size()) {
+    let [creditValue, creditName] = creditHeap.pop();
+    let [debitValue, debitName] = debitHeap.pop();
+
+    if (creditValue < debitValue) {
+      let amountLeft = creditValue - debitValue;
+      answer.push({
+        paidBy: debitName,
+        owedBy: creditName,
+        amount: -debitValue,
+      });
+      creditHeap.push([amountLeft, creditName]);
+    } else if (debitValue < creditValue) {
+      let amountLeft = debitValue - creditValue;
+      answer.push({
+        paidBy: debitName,
+        owedBy: creditName,
+        amount: -creditValue,
+      });
+      debitHeap.push([amountLeft, debitName]);
+    } else {
+      answer.push({
+        paidBy: debitName,
+        owedBy: creditName,
+        amount: -creditValue,
+      });
     }
+  }
 
-    credit.sort((a, b) => a[0] - b[0]);
-    debit.sort((a, b) => a[0] - b[0]);
-    let answer = [];
-
-    while (credit.length && debit.length) {
-        let [creditValue, creditName] = credit.pop();
-        let [debitValue, debitName] = debit.pop();
-
-        if (creditValue < debitValue) {
-            let amountLeft = creditValue - debitValue;
-            answer.push({ giver: debitName, receiver: creditName, amount: -debitValue });
-            credit.push([amountLeft, creditName]);
-            credit.sort((a, b) => a[0] - b[0]);
-        } else if (debitValue < creditValue) {
-            let amountLeft = debitValue - creditValue;
-            answer.push({ giver: debitName, receiver: creditName, amount: -creditValue });
-            debit.push([amountLeft, debitName]);
-            debit.sort((a, b) => a[0] - b[0]);
-        } else {
-            answer.push({ giver: debitName, receiver: creditName, amount: -creditValue });
-        }
-    }
-
-    return answer;
-}
+  return answer;
+};

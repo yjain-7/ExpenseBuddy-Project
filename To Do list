@@ -1,0 +1,34 @@
+Frontend
+--- UI check
+--- implement simplify function call after backend simplify done
+--- implement edit function call after backend simplify done
+--- add delete button on each expense list at the side of edit button
+--- UI change in the group info page, make the userlist as a dropdown
+    and add activites tab below that
+
+
+Backend
+--- check in add expense total amount should be equal to the sum of individual ammount with +1 -1 
+--- add Delete logic
+--- Edit logic
+--- simplify logic
+--- Activity tabs logic
+
+--- refactor code
+--- remove unused code
+--- remove unused imports
+--- remove unused variables
+--- remove unused functions
+--- remove unused classes
+--- remove unused methods
+--- remove unused properties
+--- remove unused modules
+--- remove unused packages
+--- remove unused dependencies
+
+
+
+Common
+--- Learn about deploying
+--- test with large dataset
+--- test with edge cases

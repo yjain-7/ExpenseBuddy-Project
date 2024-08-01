@@ -1,46 +1,39 @@
 const mongoose = require('mongoose');
 const Transaction = require('../models/Transaction');
-const User = require('../models/User')
+const User = require('../models/User');
 const ObjectId = mongoose.Types.ObjectId;
-const userService = require('./UserService')
+const userService = require('./UserService');
 
 exports.addUnsettled = async (unsettled, debts, paidBy) => {
-    console.log(debts)
-
     if (unsettled.length === 0) {
         for (const debt of debts) {
             if (debt.owedBy === paidBy) {
-                continue
+                continue;
             }
-            await saveTransaction(unsettled, debt, paidBy)
+            await saveTransaction(unsettled, debt, paidBy);
         }
-        console.log(unsettled)
-        return unsettled
+        console.log(unsettled);
+        return unsettled;
     } else {
-        console.log("Unsettled length is greater then 0")
+        console.log("Unsettled length is greater than 0");
+        const unsettledInfo = await getUnsettledList(unsettled);
+        console.log(JSON.stringify(unsettledInfo));
+
         for (const debt of debts) {
             if (debt.owedBy === paidBy) {
-                continue
+                continue;
             }
             try {
-                const transaction = await Transaction.findOne({
-                    owedBy: debt.owedBy,
-                    paidBy: paidBy,
-                })
-
-                const transactionInverse = await Transaction.findOne({
-                    paidBy: debt.owedBy,
-                    owedBy: paidBy,
-                })
+                const transaction = findTransaction(debt.owedBy, paidBy, unsettledInfo);
+                const transactionInverse = findTransaction(paidBy, debt.owedBy, unsettledInfo);
 
                 if (transaction) {
-                    console.log("Transaction found")
-                    transaction.amount = transaction.amount + debt.amount;
+                    console.log("Transaction found");
+                    transaction.amount += debt.amount;
                     await transaction.save();
-                }
-                else if (transactionInverse) {
-                    console.log("InverseTransaction found")
-                    inverseTransaction(unsettled, debt, transactionInverse, paidBy)
+                } else if (transactionInverse) {
+                    console.log("Inverse Transaction found");
+                    await inverseTransaction(unsettled, debt, transactionInverse, paidBy);
                 } else {
                     await saveTransaction(unsettled, debt, paidBy);
                 }
@@ -50,9 +43,18 @@ exports.addUnsettled = async (unsettled, debts, paidBy) => {
             }
         }
     }
-    console.log(unsettled)
-    return unsettled
+    console.log(unsettled);
+    return unsettled;
 };
+
+function findTransaction(owedBy, paidBy, unsettledInfo) {
+    for (const transaction of unsettledInfo) {
+        if (transaction.owedBy === owedBy && transaction.paidBy === paidBy) {
+            return transaction;
+        }
+    }
+    return false;
+}
 
 async function saveTransaction(unsettled, debt, paidBy) {
     try {
@@ -73,9 +75,8 @@ async function inverseTransaction(unsettled, debt, transactionInverse, paidBy) {
     const newAmount = Math.abs(debt.amount - transactionInverse.amount);
     if (newAmount == 0) {
         unsettled = unsettled.filter(id => id !== transactionInverse._id);
-        await Transaction.deleteOne(transactionInverse)
-    }
-    if (debt.amount > transactionInverse.amount) {
+        await Transaction.deleteOne({ _id: transactionInverse._id });
+    } else if (debt.amount > transactionInverse.amount) {
         const transaction = new Transaction({
             paidBy: paidBy,
             owedBy: debt.owedBy,
@@ -84,24 +85,24 @@ async function inverseTransaction(unsettled, debt, transactionInverse, paidBy) {
         });
 
         unsettled = unsettled.filter(id => id !== transactionInverse._id);
-        await Transaction.deleteOne(transactionInverse)
+        await Transaction.deleteOne({ _id: transactionInverse._id });
         const savedTransaction = await transaction.save();
         unsettled.push(savedTransaction._id);
     } else {
-        transactionInverse.amount = transactionInverse.amount - debt.amount;
+        transactionInverse.amount -= debt.amount;
         await transactionInverse.save();
     }
 }
 
-exports.getUnsettledList = async (unsettled) => {
-    let unsettledList = []
+async function getUnsettledList(unsettled) {
+    let unsettledList = [];
     try {
-        for (const id in unsettled) {
-            const transaction = await Transaction.findById(unsettled[id]);
+        for (const id of unsettled) {
+            const transaction = await Transaction.findById(id);
             const [paidBy, owedBy] = await Promise.all([
                 userService.getUserInfo(transaction.paidBy),
                 userService.getUserInfo(transaction.owedBy),
-            ])
+            ]);
             unsettledList.push({
                 id: transaction._id,
                 paidBy: paidBy.firstName,
@@ -110,11 +111,11 @@ exports.getUnsettledList = async (unsettled) => {
             });
         }
 
-        return unsettledList
-
-    }
-    catch (err) {
-        console.log(err)
+        return unsettledList;
+    } catch (err) {
+        console.log(err);
         return null;
     }
 }
+
+exports.getUnsettledList = getUnsettledList;
