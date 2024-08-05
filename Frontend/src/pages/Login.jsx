@@ -79,6 +79,11 @@ export default function Login() {
           >
             Submit
           </button>
+          <div className="mt-10 font-bold text-gray-500">
+            <div>Dummy accout</div>
+            <div>email : user1@gmail.com</div>
+            <div>passowrd : 123456</div>
+          </div>
         </form>
       </div>
       <div className="hidden md:block">

@@ -124,7 +124,7 @@ export default function AddExpenseModal({ auth, onClose, usersList, groupCode, s
               />
             </div>
 
-            <p>Selected User ID: {selectedUserId}</p>
+            {/* <p>Selected User ID: {selectedUserId}</p> */}
 
             <div className="mt-4 mb-4">
               <label className="inline-flex items-center">

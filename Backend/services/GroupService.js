@@ -5,7 +5,8 @@ const expenseService = require('./ExpenseService')
 const userService = require('./UserService')
 const groupService = require('../services/GroupService')
 const Transaction = require("../models/Transaction");
-
+const mongoose = require("mongoose");
+const ObjectId = mongoose.Types.ObjectId;
 
 exports.createGroup = async (userId, name, description) => {
     try {
@@ -100,12 +101,13 @@ exports.addExpense = async (groupCode, debts, paidBy, expense) => {
 exports.getGroup = async (groupCode) => {
     try {
         let group = await this.getGroupObject(groupCode);
+        let user  = await User.findOne({ _id: group.createdBy.userId })
         console.log(group)
         let groupData = {
             name: group?.name ?? 'Default Name',
             description: group?.description ?? 'No description provided',
             groupCode: groupCode ?? 'Unknown Group Code',
-            createdBy: group?.createdBy ?? 'Unknown Creator',
+            createdBy: user.firstName+" "+user.lastName ?? 'Unknown Creator',
             usersList: group?.usersList ?? []
         };
 

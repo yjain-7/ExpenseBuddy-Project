@@ -33,7 +33,7 @@ function GroupInfoCard({ title, description, groupCode, auth }) {
       searchParams.append('name', groupInfo.name);
       searchParams.append('description', groupInfo.description);
       searchParams.append('groupCode', groupInfo.groupCode);
-      searchParams.append('createdBy', groupInfo.createdBy.userId);
+      searchParams.append('createdBy', groupInfo.createdBy);
       searchParams.append('usersList', JSON.stringify(groupInfo.usersList));
       searchParams.append('expenseList', JSON.stringify(groupInfo.expenseList));
       searchParams.append('unsettled', JSON.stringify(groupInfo.unsettled));
