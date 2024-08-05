@@ -1,116 +1,89 @@
-const mongoose = require('mongoose');
-const Transaction = require('../models/Transaction');
-const User = require('../models/User');
+const mongoose = require("mongoose");
+const Transaction = require("../models/Transaction");
+const User = require("../models/User");
 const ObjectId = mongoose.Types.ObjectId;
-const userService = require('./UserService');
+const userService = require("./UserService");
 
 exports.addUnsettled = async (unsettled, debts, paidBy) => {
     if (unsettled.length === 0) {
         for (const debt of debts) {
-            if (debt.owedBy === paidBy) {
-                continue;
-            }
-            await saveTransaction(unsettled, debt, paidBy);
+            if (paidBy.toString() === debt.owedBy) continue;
+            const transaction = new Transaction({
+                paidBy: paidBy,
+                owedBy: debt.owedBy,
+                amount: debt.amount,
+            });
+
+            const savedTransaction = await transaction.save();
+            unsettled.push(savedTransaction._id.toString());
         }
-        console.log(unsettled);
-        return unsettled;
     } else {
-        console.log("Unsettled length is greater than 0");
-        const unsettledInfo = await getUnsettledList(unsettled);
-        console.log(JSON.stringify(unsettledInfo));
+        const unsettleList = await getUnsettledList(unsettled);
+        console.log("Unsettle list greater than 0\n" + JSON.stringify(unsettleList));
 
         for (const debt of debts) {
-            if (debt.owedBy === paidBy) {
-                continue;
-            }
-            try {
-                const transaction = findTransaction(debt.owedBy, paidBy, unsettledInfo);
-                const transactionInverse = findTransaction(paidBy, debt.owedBy, unsettledInfo);
+            if (debt.owedBy === paidBy.toString()) continue;
 
-                if (transaction) {
-                    console.log("Transaction found");
-                    transaction.amount += debt.amount;
-                    await transaction.save();
-                } else if (transactionInverse) {
-                    console.log("Inverse Transaction found");
-                    await inverseTransaction(unsettled, debt, transactionInverse, paidBy);
+            const transaction = findTransaction(paidBy.toString(), debt.owedBy, unsettleList);
+            const inverseTransaction = findTransaction(debt.owedBy, paidBy.toString(), unsettleList);
+
+            if (transaction) {
+                console.log("Transaction found\n" + transaction);
+                transaction.amount = parseFloat(transaction.amount) + parseFloat(debt.amount);
+                await transaction.save();
+            } else if (inverseTransaction) {
+                console.log("InverseTransaction found\n" + inverseTransaction);
+                const newAmount = parseFloat(inverseTransaction.amount) - parseFloat(debt.amount);
+                console.log("New amount after deduction: " + newAmount);
+
+                if (newAmount < 0) {
+                    removeUnsettledTransaction(unsettled, inverseTransaction._id.toString());
+                    const newTransaction = new Transaction({
+                        paidBy: paidBy,
+                        owedBy: debt.owedBy,
+                        amount: -newAmount,
+                    });
+                    const savedTransaction = await newTransaction.save();
+                    unsettled.push(savedTransaction._id.toString());
+                } else if (newAmount > 0) {
+                    inverseTransaction.amount = newAmount;
+                    await inverseTransaction.save();
                 } else {
-                    await saveTransaction(unsettled, debt, paidBy);
+                    removeUnsettledTransaction(unsettled, inverseTransaction._id.toString());
                 }
-            } catch (err) {
-                console.log(err);
-                return false;
+            } else {
+                const newTransaction = new Transaction({
+                    paidBy: paidBy,
+                    owedBy: debt.owedBy,
+                    amount: debt.amount,
+                });
+                const savedTransaction = await newTransaction.save();
+                unsettled.push(savedTransaction._id.toString());
             }
         }
     }
-    console.log(unsettled);
+
     return unsettled;
 };
 
-function findTransaction(owedBy, paidBy, unsettledInfo) {
-    for (const transaction of unsettledInfo) {
-        if (transaction.owedBy === owedBy && transaction.paidBy === paidBy) {
+function findTransaction(paidBy, owedBy, unsettledList) {
+    for (const transaction of unsettledList) {
+        if (transaction.paidBy.toString() === paidBy && transaction.owedBy.toString() === owedBy) {
             return transaction;
         }
     }
-    return false;
-}
-
-async function saveTransaction(unsettled, debt, paidBy) {
-    try {
-        const transaction = new Transaction({
-            paidBy: paidBy,
-            owedBy: debt.owedBy,
-            amount: debt.amount,
-            settled: false
-        });
-        const savedTransaction = await transaction.save();
-        unsettled.push(savedTransaction._id);
-    } catch (err) {
-        console.log(err);
-    }
-}
-
-async function inverseTransaction(unsettled, debt, transactionInverse, paidBy) {
-    const newAmount = Math.abs(debt.amount - transactionInverse.amount);
-    if (newAmount == 0) {
-        unsettled = unsettled.filter(id => id !== transactionInverse._id);
-        await Transaction.deleteOne({ _id: transactionInverse._id });
-    } else if (debt.amount > transactionInverse.amount) {
-        const transaction = new Transaction({
-            paidBy: paidBy,
-            owedBy: debt.owedBy,
-            amount: newAmount,
-            settled: false
-        });
-
-        unsettled = unsettled.filter(id => id !== transactionInverse._id);
-        await Transaction.deleteOne({ _id: transactionInverse._id });
-        const savedTransaction = await transaction.save();
-        unsettled.push(savedTransaction._id);
-    } else {
-        transactionInverse.amount -= debt.amount;
-        await transactionInverse.save();
-    }
+    console.log("Transaction not found");
+    return null;
 }
 
 async function getUnsettledList(unsettled) {
-    let unsettledList = [];
     try {
+        const unsettledList = [];
         for (const id of unsettled) {
-            const transaction = await Transaction.findById(id);
-            const [paidBy, owedBy] = await Promise.all([
-                userService.getUserInfo(transaction.paidBy),
-                userService.getUserInfo(transaction.owedBy),
-            ]);
-            unsettledList.push({
-                id: transaction._id,
-                paidBy: paidBy.firstName,
-                owedBy: owedBy.firstName,
-                amount: transaction.amount
-            });
+            const objectId = new ObjectId(id);
+            const transaction = await Transaction.findById(objectId);
+            unsettledList.push(transaction);
         }
-
         return unsettledList;
     } catch (err) {
         console.log(err);
@@ -118,4 +91,29 @@ async function getUnsettledList(unsettled) {
     }
 }
 
-exports.getUnsettledList = getUnsettledList;
+function removeUnsettledTransaction(unsettled, transactionId) {
+    const index = unsettled.indexOf(transactionId);
+    if (index > -1) {
+        unsettled.splice(index, 1);
+    }
+}
+
+exports.getUnsettledListInfo = async (unsettled) => {
+    try {
+        const unsettledList = [];
+        for (const id of unsettled) {
+            const objectId = new ObjectId(id);
+            const transaction = await Transaction.findById(objectId);
+            unsettledList.push({
+                id: transaction.id.toString(),
+                paidBy: (await userService.getUserInfo(transaction.paidBy)).firstName,
+                owedBy: (await userService.getUserInfo(transaction.owedBy)).firstName,
+                amount: parseFloat(transaction.amount),
+            });
+        }
+        return unsettledList;
+    } catch (err) {
+        console.log(err);
+        return null;
+    }
+};

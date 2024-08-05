@@ -7,7 +7,7 @@ import UnequalSplit from "./UnequalSplit";
 
 export default function AddExpenseModal({ auth, onClose, usersList, groupCode, setExpenseList, setUnsettled }) {
   const [title, setTitle] = useState("");
-  const [amount, setAmount] = useState(0);
+  const [amount, setAmount] = useState();
   const [selectedUserId, setSelectedUserId] = useState(null);
   const [description, setDescription] = useState("");
   const [splitType, setSplitType] = useState("equal");

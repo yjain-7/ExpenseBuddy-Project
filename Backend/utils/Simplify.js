@@ -30,6 +30,7 @@ exports.simplifyDebts = (transactions) => {
 
     if (creditValue < debitValue) {
       let amountLeft = creditValue - debitValue;
+      amountLeft = parseFloat(amountLeft.toFixed(2));
       answer.push({
         paidBy: debitName,
         owedBy: creditName,
@@ -38,6 +39,7 @@ exports.simplifyDebts = (transactions) => {
       creditHeap.push([amountLeft, creditName]);
     } else if (debitValue < creditValue) {
       let amountLeft = debitValue - creditValue;
+      amountLeft = parseFloat(amountLeft.toFixed(2));
       answer.push({
         paidBy: debitName,
         owedBy: creditName,

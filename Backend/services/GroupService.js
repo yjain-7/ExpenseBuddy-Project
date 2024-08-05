@@ -4,6 +4,8 @@ const transactionService = require('./TransactionService');
 const expenseService = require('./ExpenseService')
 const userService = require('./UserService')
 const groupService = require('../services/GroupService')
+const Transaction = require("../models/Transaction");
+
 
 exports.createGroup = async (userId, name, description) => {
     try {
@@ -19,7 +21,6 @@ exports.createGroup = async (userId, name, description) => {
             createdBy: { userId: userId, name: user.name },
         });
 
-        // Update user with the new group ID
         newGroup.usersList.push({ userId: userId, name: user.firstName });
         const group = await newGroup.save();
         user.groupsList.push({ groupId: group._id, name: group.name, description: group.description, groupCode: group.groupCode });
@@ -52,7 +53,7 @@ exports.joinGroup = async (userId, groupCode) => {
         }
         group.usersList.push({ userId: userId, name: user.firstName });
         await group.save();
-        user.groupsList.push({ groupId: group._id, name: group.name,  description: group.description, groupCode: group.groupCode });
+        user.groupsList.push({ groupId: group._id, name: group.name, description: group.description, groupCode: group.groupCode });
         await user.save();
 
         return user
@@ -88,7 +89,7 @@ exports.addExpense = async (groupCode, debts, paidBy, expense) => {
         }
         group.unsettled = unsettled
         await group.save();
-        return {unsettled:unsettled,expenseList:group.expensesList};
+        return { unsettled: await transactionService.getUnsettledListInfo(unsettled), expenseList: group.expensesList };
     } catch (error) {
         console.error(error);
         return false;
@@ -101,26 +102,25 @@ exports.getGroup = async (groupCode) => {
         let group = await this.getGroupObject(groupCode);
         console.log(group)
         let groupData = {
-            name: group?.name ?? 'Default Name', // Fallback value if `group.name` is null or undefined
-            description: group?.description ?? 'No description provided', // Fallback value if `group.description` is null or undefined
-            groupCode: groupCode ?? 'Unknown Group Code', // Fallback value if `groupCode` is null or undefined
-            createdBy: group?.createdBy ?? 'Unknown Creator', // Fallback value if `group.createdBy` is null or undefined
-            usersList: group?.usersList ?? [] // Fallback value if `group.usersList` is null or undefined
+            name: group?.name ?? 'Default Name',
+            description: group?.description ?? 'No description provided',
+            groupCode: groupCode ?? 'Unknown Group Code',
+            createdBy: group?.createdBy ?? 'Unknown Creator',
+            usersList: group?.usersList ?? []
         };
-        
 
-        console.log(group?.expensesList??[])
 
-        // Await both promises to resolve before proceeding
+        console.log(group?.expensesList ?? [])
+
         const [expenses, unsettledList] = await Promise.all([
             expenseService.getExpenseList(group.expensesList),
-            transactionService.getUnsettledList(group.unsettled)
+            transactionService.getUnsettledListInfo(group.unsettled)
         ]);
 
         groupData.expenseList = expenses;
         groupData.unsettled = unsettledList;
 
-        console.log(groupData); // Now you'll see full data
+        console.log(groupData);
         return groupData;
     } catch (err) {
         console.error(err);
@@ -128,12 +128,13 @@ exports.getGroup = async (groupCode) => {
     }
 }
 
-exports.getGroupObject = async(groupCode)=>{
-    try{
+
+exports.getGroupObject = async (groupCode) => {
+    try {
         let group = await Group.findOne({ groupCode });
         return group
-    }catch(err){
-        console.error("Error getting group form db: " +err);
+    } catch (err) {
+        console.error("Error getting group form db: " + err);
     }
 }
 
