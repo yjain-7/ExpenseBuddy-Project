@@ -4,7 +4,8 @@ import Signup from "./pages/Signup";
 import GroupInfo from "./pages/GroupInfo";
 import UserInfo from "./pages/UserInfo";
 import Navbar from "./components/Navbar";
-import About from "./pages/About"
+import About from "./pages/About";
+
 function App() {
   const router = createBrowserRouter([
     {
@@ -31,9 +32,10 @@ function App() {
 
   return (
     <>
-      <Navbar className="fixed top-0 w-full z-50 bg-white shadow-md"></Navbar>
-      <div className="pt-6"></div>
-      <RouterProvider router={router} />;
+      <Navbar className="fixed w-full z-50 bg-white shadow-md" />
+      <div className=""> {/* Adjust padding here to match the height of the Navbar */}
+        <RouterProvider router={router} />
+      </div>
     </>
   );
 }

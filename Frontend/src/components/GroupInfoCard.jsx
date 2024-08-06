@@ -37,6 +37,7 @@ function GroupInfoCard({ title, description, groupCode, auth }) {
       searchParams.append('usersList', JSON.stringify(groupInfo.usersList));
       searchParams.append('expenseList', JSON.stringify(groupInfo.expenseList));
       searchParams.append('unsettled', JSON.stringify(groupInfo.unsettled));
+      searchParams.append('activites', JSON.stringify(groupInfo.activities))
 
       navigate(`/groupInfo?${searchParams.toString()}`);
     } catch (error) {

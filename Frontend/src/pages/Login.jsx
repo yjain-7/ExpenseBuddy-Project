@@ -86,7 +86,7 @@ export default function Login() {
           </div>
         </form>
       </div>
-      <div className="hidden md:block">
+      <div className="bg-logo hidden md:block">
         <Card />
       </div>
     </div>

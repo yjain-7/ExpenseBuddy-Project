@@ -2,7 +2,7 @@ import logo from "../assets/logo2.png";
 
 function Card() {
   return (
-    <div className="pt-25 bg-logo h-screen flex flex-col justify-center items-center">
+    <div className="bg-logo h-screen flex flex-col justify-center items-center pb-12">
       <div className="flex justify-center">
         <img src={logo} alt="Logo" className="object-contain max-h-80" />
       </div>

@@ -53,6 +53,7 @@ exports.joinGroup = async (userId, groupCode) => {
             return null;
         }
         group.usersList.push({ userId: userId, name: user.firstName });
+        group.activities.push(`${user.firstName} ${user.lastName} joined the group.`)
         await group.save();
         user.groupsList.push({ groupId: group._id, name: group.name, description: group.description, groupCode: group.groupCode });
         await user.save();
@@ -76,7 +77,7 @@ exports.getAllGroups = async () => {
     }
 }
 
-exports.addExpense = async (groupCode, debts, paidBy, expense) => {
+exports.addExpense = async (req, groupCode, debts, paidBy, expense) => {
     try {
         console.log(groupCode)
         const group = await groupService.getGroupObject(groupCode)
@@ -89,6 +90,13 @@ exports.addExpense = async (groupCode, debts, paidBy, expense) => {
             return false;
         }
         group.unsettled = unsettled
+        const user = await User.findOne({_id : req.userId})
+        const {title, totalAmount} = req.body
+        console.log("----------------")
+        console.log("Title: "+title)
+        console.log("TotalAmount "+totalAmount)
+
+        group.activities.unshift(`Expense '${title}' of ${totalAmount} added by ${user.firstName} ${user.lastName}.`);
         await group.save();
         return { unsettled: await transactionService.getUnsettledListInfo(unsettled), expenseList: group.expensesList };
     } catch (error) {
@@ -121,7 +129,7 @@ exports.getGroup = async (groupCode) => {
 
         groupData.expenseList = expenses;
         groupData.unsettled = unsettledList;
-
+        groupData.activities = group.activities
         console.log(groupData);
         return groupData;
     } catch (err) {
