@@ -1,5 +1,7 @@
 const jwt = require('jsonwebtoken');
-const SECRETKEY = "expensebuddy"
+require('dotenv').config();
+
+const SECRETKEY = process.env.SECRETKEY
 
 exports.getToken = (email, userId)=>{
     return jwt.sign({ email, userId }, SECRETKEY)

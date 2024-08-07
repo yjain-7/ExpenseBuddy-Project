@@ -1,9 +1,9 @@
 const User = require('../models/User');
-const Group = require('../models/Group')
+const Group = require('../models/Group');
 const transactionService = require('./TransactionService');
-const expenseService = require('./ExpenseService')
-const userService = require('./UserService')
-const groupService = require('../services/GroupService')
+const expenseService = require('./ExpenseService');
+const userService = require('./UserService');
+const groupService = require('../services/GroupService');
 const Transaction = require("../models/Transaction");
 const mongoose = require("mongoose");
 const ObjectId = mongoose.Types.ObjectId;
@@ -16,7 +16,7 @@ exports.createGroup = async (userId, name, description) => {
             throw new Error("User not found");
         }
         if (user.groupsList.length === 10) {
-            return null
+            return null;
         }
         const newGroup = new Group({
             groupCode,
@@ -29,7 +29,7 @@ exports.createGroup = async (userId, name, description) => {
         const group = await newGroup.save();
         user.groupsList.push({ groupId: group._id, name: group.name, description: group.description, groupCode: group.groupCode });
         await user.save();
-        return user
+        return user;
     } catch (err) {
         console.error(err);
         throw new Error("Error creating group");
@@ -46,7 +46,6 @@ exports.joinGroup = async (userId, groupCode) => {
             throw new Error("User already in the group");
         }
 
-
         const user = await User.findOne({ _id: userId });
         if (!user) {
             throw new Error("User not found");
@@ -55,12 +54,12 @@ exports.joinGroup = async (userId, groupCode) => {
             return null;
         }
         group.usersList.push({ userId: userId, name: user.firstName });
-        group.activities.push(`${user.firstName} ${user.lastName} joined the group.`)
+        group.activities.push(`${user.firstName} ${user.lastName} joined the group.`);
         await group.save();
         user.groupsList.push({ groupId: group._id, name: group.name, description: group.description, groupCode: group.groupCode });
         await user.save();
 
-        return user
+        return user;
     } catch (err) {
         console.error(err);
         throw new Error("Error joining group");
@@ -71,18 +70,16 @@ exports.getAllGroups = async () => {
     try {
         const groupData = await Group.find().exec();
         const groupList = await Promise.all(groupData.map(group => getGroupData(group)));
-        // console.log(groupList);
         return groupList;
     } catch (err) {
         console.error(err);
-        res.status(500).send('Internal Server Error');
+        throw new Error("Internal Server Error");
     }
-}
+};
 
 exports.addExpense = async (req, groupCode, debts, paidBy, expense) => {
     try {
-        // console.log(groupCode)
-        const group = await groupService.getGroupObject(groupCode)
+        const group = await groupService.getGroupObject(groupCode);
         if (!group) {
             throw new Error("Group not found");
         }
@@ -91,12 +88,9 @@ exports.addExpense = async (req, groupCode, debts, paidBy, expense) => {
         if (!unsettled) {
             return false;
         }
-        group.unsettled = unsettled
-        const user = await User.findOne({ _id: req.userId })
-        const { title, totalAmount } = req.body
-        // console.log("----------------")
-        // console.log("Title: " + title)
-        // console.log("TotalAmount " + totalAmount)
+        group.unsettled = unsettled;
+        const user = await User.findOne({ _id: req.userId });
+        const { title, totalAmount } = req.body;
 
         group.activities.unshift(`Expense '${title}' of ${totalAmount} added by ${user.firstName} ${user.lastName}.`);
         await group.save();
@@ -107,12 +101,10 @@ exports.addExpense = async (req, groupCode, debts, paidBy, expense) => {
     }
 };
 
-
 exports.getGroup = async (groupCode) => {
     try {
         let group = await this.getGroupObject(groupCode);
-        let user = await User.findOne({ _id: group.createdBy.userId })
-        // console.log(group)
+        let user = await User.findOne({ _id: group.createdBy.userId });
         let groupData = {
             name: group?.name ?? 'Default Name',
             description: group?.description ?? 'No description provided',
@@ -121,9 +113,6 @@ exports.getGroup = async (groupCode) => {
             usersList: group?.usersList ?? []
         };
 
-
-        // console.log(group?.expensesList ?? [])
-
         const [expenses, unsettledList] = await Promise.all([
             expenseService.getExpenseList(group.expensesList),
             transactionService.getUnsettledListInfo(group.unsettled)
@@ -131,24 +120,23 @@ exports.getGroup = async (groupCode) => {
 
         groupData.expenseList = expenses;
         groupData.unsettled = unsettledList;
-        groupData.activities = group.activities
-        // console.log(groupData);
+        groupData.activities = group.activities;
         return groupData;
     } catch (err) {
         console.error(err);
         return false;
     }
-}
-
+};
 
 exports.getGroupObject = async (groupCode) => {
     try {
         let group = await Group.findOne({ groupCode });
-        return group
+        return group;
     } catch (err) {
-        console.error("Error getting group form db: " + err);
+        console.error("Error getting group from db: " + err);
+        throw new Error("Error getting group from db");
     }
-}
+};
 
 exports.removeUser = async (groupCode, userId) => {
     try {
@@ -166,19 +154,15 @@ exports.removeUser = async (groupCode, userId) => {
 };
 
 function generateGroupCode() {
-    // console.log("Generating group code")
     let groupCode = '';
     const charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*';
     const charsetLength = charset.length;
     for (let i = 0; i < 6; i++) {
         groupCode += charset.charAt(Math.floor(Math.random() * charsetLength));
     }
-    // console.log(groupCode)
     return groupCode;
 }
 
 function userAlreadyExist(group, userId) {
     return group.usersList.some(user => user.userId.toString() === userId.toString());
 }
-
-
