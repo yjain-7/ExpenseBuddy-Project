@@ -2,13 +2,10 @@ import React from 'react';
 
 const UnsettledCard = ({ unsettled, groupCode, setUnsettled }) => {
   const auth = localStorage.getItem('authToken');
-  console.log("Unsettle id "+unsettled.id);
-  console.log("Groupcode "+groupCode);
-
   const handleSettle = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch('http://localhost:3000/api/expenses/settle', {
+      const response = await fetch('https://expensebuddy-backend-n7y9.onrender.com/api/expenses/settle', {
         method: 'DELETE',
         headers: {
           Authorization: auth,

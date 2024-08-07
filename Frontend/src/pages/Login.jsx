@@ -20,7 +20,7 @@ export default function Login() {
     setError(null);
 
     try {
-      const response = await fetch("http://localhost:3000/api/users/login", {
+      const response = await fetch("https://expensebuddy-backend-n7y9.onrender.com/api/users/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

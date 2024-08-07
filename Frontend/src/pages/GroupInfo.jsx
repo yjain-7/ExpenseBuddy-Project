@@ -31,7 +31,7 @@ export const GroupInfo = () => {
 
   const simplifyDebts = async () => {
     try {
-      const url = "http://localhost:3000/api/expenses/simplify";
+      const url = "https://expensebuddy-backend-n7y9.onrender.com/api/expenses/simplify";
       const response = await fetch(url, {
         method: "POST",
         headers: {
@@ -142,7 +142,7 @@ export const GroupInfo = () => {
         </button>
         <button
           className={`flex-1 text-center py-2 ${
-            showUnsettled ? "bg-gray-200" : "bg-white"
+            showActivites ? "bg-gray-200" : "bg-white"
           } rounded`}
           onClick={toggleActivities}
         >

@@ -13,10 +13,15 @@ export default function AddExpenseModal({ auth, onClose, usersList, groupCode, s
   const [splitType, setSplitType] = useState("equal");
   const [splitData, setSplitData] = useState(null);
   const [error, setError] = useState(null);
+  const [isDisabled, setIsDisabled] = useState(false)
   const navigate = useNavigate();
+  const handleAddExpenseButton = () =>{
+    setIsDisabled(true)
+    submitExpense()
+  }
   const submitExpense = async () => {
     try {
-      const url = "http://localhost:3000/api/expenses/addExpense";
+      const url = "https://expensebuddy-backend-n7y9.onrender.com/api/expenses/addExpense";
       const response = await fetch(url, {
         method: "POST",
         headers: {
@@ -43,6 +48,7 @@ export default function AddExpenseModal({ auth, onClose, usersList, groupCode, s
         setExpenseList(data.expenseList)
         setUnsettled(data.unsettled)
         onClose();
+        setIsDisabled(false)
       }
     } catch (e) {
       console.log(e.message);
@@ -163,7 +169,8 @@ export default function AddExpenseModal({ auth, onClose, usersList, groupCode, s
             <button
               type="submit"
               className="mt-4 w-full flex items-center justify-center gap-2 px-5 py-3 font-medium rounded-md bg-black text-white"
-              onClick={submitExpense}
+              disabled={isDisabled}
+              onClick={handleAddExpenseButton}
             >
               Add Expense
             </button>

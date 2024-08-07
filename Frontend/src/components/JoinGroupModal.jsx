@@ -14,7 +14,7 @@ const JoinGroupModal = ({ auth, onClose }) => {
     }
     try {
       const response = await fetch(
-        "http://localhost:3000/api/groups/joinGroup",
+        "https://expensebuddy-backend-n7y9.onrender.com/api/groups/joinGroup",
         {
           method: "POST",
           headers: {
