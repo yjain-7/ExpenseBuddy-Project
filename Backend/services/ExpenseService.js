@@ -28,10 +28,10 @@ exports.createExpense = async (req) => {
         const expense = await newExpense.save();
 
         if (expense) {
-            console.log("Expense saved")
+            // console.log("Expense saved")
             return expense
         } else {
-            console.log("Expense not saved")
+            // console.log("Expense not saved")
             return null;
         }
     } catch (err) {
@@ -42,10 +42,10 @@ exports.createExpense = async (req) => {
 
 exports.simplify = async (unsettled) => {
     let transactions = [];
-    console.log("IN simplify service")
+    // console.log("IN simplify service")
     for (const trans of unsettled) {
         try {
-            console.log("------------\n"+trans);
+            // console.log("------------\n"+trans);
             let transaction = await Transaction.findById(trans);
             if (transaction) {
                 transactions.push(transaction)
@@ -55,14 +55,14 @@ exports.simplify = async (unsettled) => {
         }
     }
 
-    console.log("Befor simplification\n"+JSON.stringify(transactions));
+    // console.log("Befor simplification\n"+JSON.stringify(transactions));
     let simplified = simplify.simplifyDebts(transactions);
-    console.log("After simplification\n"+JSON.stringify(simplified));
+    // console.log("After simplification\n"+JSON.stringify(simplified));
     return simplified
 };
 
 exports.getExpenseList = async (expenseList) => {
-    console.log(expenseList)
+    // console.log(expenseList)
     let expenses = [];
     for (const expenseid of expenseList) {
         try {

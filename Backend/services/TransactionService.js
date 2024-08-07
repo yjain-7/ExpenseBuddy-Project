@@ -19,7 +19,7 @@ exports.addUnsettled = async (unsettled, debts, paidBy) => {
         }
     } else {
         const unsettleList = await getUnsettledList(unsettled);
-        console.log("Unsettle list greater than 0\n" + JSON.stringify(unsettleList));
+        // console.log("Unsettle list greater than 0\n" + JSON.stringify(unsettleList));
 
         for (const debt of debts) {
             if (debt.owedBy === paidBy.toString()) continue;
@@ -28,13 +28,13 @@ exports.addUnsettled = async (unsettled, debts, paidBy) => {
             const inverseTransaction = findTransaction(debt.owedBy, paidBy.toString(), unsettleList);
 
             if (transaction) {
-                console.log("Transaction found\n" + transaction);
+                // console.log("Transaction found\n" + transaction);
                 transaction.amount = parseFloat(transaction.amount) + parseFloat(debt.amount);
                 await transaction.save();
             } else if (inverseTransaction) {
-                console.log("InverseTransaction found\n" + inverseTransaction);
+                // console.log("InverseTransaction found\n" + inverseTransaction);
                 const newAmount = parseFloat(inverseTransaction.amount) - parseFloat(debt.amount);
-                console.log("New amount after deduction: " + newAmount);
+                // console.log("New amount after deduction: " + newAmount);
 
                 if (newAmount < 0) {
                     removeUnsettledTransaction(unsettled, inverseTransaction._id.toString());
@@ -72,7 +72,7 @@ function findTransaction(paidBy, owedBy, unsettledList) {
             return transaction;
         }
     }
-    console.log("Transaction not found");
+    // console.log("Transaction not found");
     return null;
 }
 

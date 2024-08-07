@@ -15,6 +15,9 @@ exports.createGroup = async (userId, name, description) => {
         if (!user) {
             throw new Error("User not found");
         }
+        if (user.groupsList.length === 10) {
+            return null
+        }
         const newGroup = new Group({
             groupCode,
             name,
@@ -39,7 +42,6 @@ exports.joinGroup = async (userId, groupCode) => {
         if (!group) {
             throw new Error("Invalid groupCode");
         }
-        // Check if user is already in that group
         if (userAlreadyExist(group, userId)) {
             throw new Error("User already in the group");
         }
@@ -69,7 +71,7 @@ exports.getAllGroups = async () => {
     try {
         const groupData = await Group.find().exec();
         const groupList = await Promise.all(groupData.map(group => getGroupData(group)));
-        console.log(groupList);
+        // console.log(groupList);
         return groupList;
     } catch (err) {
         console.error(err);
@@ -79,7 +81,7 @@ exports.getAllGroups = async () => {
 
 exports.addExpense = async (req, groupCode, debts, paidBy, expense) => {
     try {
-        console.log(groupCode)
+        // console.log(groupCode)
         const group = await groupService.getGroupObject(groupCode)
         if (!group) {
             throw new Error("Group not found");
@@ -90,11 +92,11 @@ exports.addExpense = async (req, groupCode, debts, paidBy, expense) => {
             return false;
         }
         group.unsettled = unsettled
-        const user = await User.findOne({_id : req.userId})
-        const {title, totalAmount} = req.body
-        console.log("----------------")
-        console.log("Title: "+title)
-        console.log("TotalAmount "+totalAmount)
+        const user = await User.findOne({ _id: req.userId })
+        const { title, totalAmount } = req.body
+        // console.log("----------------")
+        // console.log("Title: " + title)
+        // console.log("TotalAmount " + totalAmount)
 
         group.activities.unshift(`Expense '${title}' of ${totalAmount} added by ${user.firstName} ${user.lastName}.`);
         await group.save();
@@ -109,18 +111,18 @@ exports.addExpense = async (req, groupCode, debts, paidBy, expense) => {
 exports.getGroup = async (groupCode) => {
     try {
         let group = await this.getGroupObject(groupCode);
-        let user  = await User.findOne({ _id: group.createdBy.userId })
-        console.log(group)
+        let user = await User.findOne({ _id: group.createdBy.userId })
+        // console.log(group)
         let groupData = {
             name: group?.name ?? 'Default Name',
             description: group?.description ?? 'No description provided',
             groupCode: groupCode ?? 'Unknown Group Code',
-            createdBy: user.firstName+" "+user.lastName ?? 'Unknown Creator',
+            createdBy: user.firstName + " " + user.lastName ?? 'Unknown Creator',
             usersList: group?.usersList ?? []
         };
 
 
-        console.log(group?.expensesList ?? [])
+        // console.log(group?.expensesList ?? [])
 
         const [expenses, unsettledList] = await Promise.all([
             expenseService.getExpenseList(group.expensesList),
@@ -130,7 +132,7 @@ exports.getGroup = async (groupCode) => {
         groupData.expenseList = expenses;
         groupData.unsettled = unsettledList;
         groupData.activities = group.activities
-        console.log(groupData);
+        // console.log(groupData);
         return groupData;
     } catch (err) {
         console.error(err);
@@ -148,15 +150,30 @@ exports.getGroupObject = async (groupCode) => {
     }
 }
 
+exports.removeUser = async (groupCode, userId) => {
+    try {
+        const group = await Group.findOne({ groupCode: groupCode });
+        if (!group) {
+            throw new Error('Group not found');
+        }
+
+        group.usersList = group.usersList.filter(user => user.userId !== userId);
+        await group.save();
+    } catch (error) {
+        console.error(error);
+        throw new Error('An error occurred while removing the user from the group');
+    }
+};
+
 function generateGroupCode() {
-    console.log("Generating group code")
+    // console.log("Generating group code")
     let groupCode = '';
     const charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*';
     const charsetLength = charset.length;
     for (let i = 0; i < 6; i++) {
         groupCode += charset.charAt(Math.floor(Math.random() * charsetLength));
     }
-    console.log(groupCode)
+    // console.log(groupCode)
     return groupCode;
 }
 

@@ -1,8 +1,8 @@
 const Debt = require('../models/Debt')
 const userService = require('./UserService')
 exports.createDebt = async (debts, paidBy) => {
-    console.log(debts)
-    console.log(paidBy)
+    // console.log(debts)
+    // console.log(paidBy)
 
     const debtIds = [];
 

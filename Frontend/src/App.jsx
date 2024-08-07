@@ -5,7 +5,6 @@ import GroupInfo from "./pages/GroupInfo";
 import UserInfo from "./pages/UserInfo";
 import Navbar from "./components/Navbar";
 import About from "./pages/About";
-
 function App() {
   const router = createBrowserRouter([
     {

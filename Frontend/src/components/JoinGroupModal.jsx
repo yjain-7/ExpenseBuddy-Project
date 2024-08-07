@@ -32,6 +32,10 @@ const JoinGroupModal = ({ auth, onClose }) => {
         onClose();
       } else {
         // Handle error
+        if(!response.ok){
+          const errorData = await response.json();
+          alert(errorData.error);
+        }
         console.error("Failed to join group");
       }
       navigate("/userInfo", { state: { userInfo } });

@@ -26,7 +26,7 @@ exports.addUnsettled = async (unsettled, debts, paidBy) => {
         }
     } else {
         const unsettleList = getUnsettledList(unsettled);
-        console.log("Unsettle list greater then 0\n" + unsettleList);
+        // console.log("Unsettle list greater then 0\n" + unsettleList);
         for (const debt of debts) {
             const transaction = findTransaction(paidBy, debt.owedBy, unsettleList);
             const inverseTransaction = findTransaction(debt.owedBy, paidBy, unsettleList);
