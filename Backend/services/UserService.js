@@ -46,7 +46,7 @@ exports.loginUser = async (email, password) => {
 
 exports.getUserInfo = async (userId) => {
   try {
-    const user = await User.findById(userId); // Use findById instead of findOne for clarity
+    const user = await User.find({_id:userId}); // Use findById instead of findOne for clarity
     if (!user) {
       throw new Error("User not found");
     }

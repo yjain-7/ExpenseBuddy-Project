@@ -18,9 +18,11 @@ export default function Login() {
     }
 
     setError(null);
-
+    const BASEURL = import.meta.env.VITE_BASEURL
+    const url = BASEURL+"users/login";
+    console.log(url)
     try {
-      const response = await fetch("https://expensebuddy-backend-n7y9.onrender.com/api/users/login", {
+      const response = await fetch(BASEURL+"users/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
