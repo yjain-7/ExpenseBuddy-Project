@@ -21,7 +21,7 @@ export default function Login() {
 
     try {
       const BASEURL = import.meta.env.VITE_BASEURL
-      const response = await fetch(BASEURL+"/users/login", {
+      const response = await fetch(BASEURL+"users/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
