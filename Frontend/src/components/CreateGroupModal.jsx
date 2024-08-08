@@ -16,7 +16,8 @@ export default function CreateGroupModal ({ auth, onClose }) {
     }
     setError(null)
     try{
-      const response = await fetch('https://expensebuddy-backend-n7y9.onrender.com/api/groups/createGroup', {
+      const BASEURL = import.meta.env.VITE_BASEURL
+      const response = await fetch(BASEURL+'groups/createGroup', {
         method: 'POST',
         headers: {
           'Authorization': auth,

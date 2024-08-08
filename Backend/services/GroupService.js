@@ -94,10 +94,6 @@ exports.addExpense = async (req, groupCode, debts, paidBy, expense) => {
         group.unsettled = unsettled
         const user = await User.findOne({ _id: req.userId })
         const { title, totalAmount } = req.body
-        // console.log("----------------")
-        // console.log("Title: " + title)
-        // console.log("TotalAmount " + totalAmount)
-
         group.activities.unshift(`Expense '${title}' of ${totalAmount} added by ${user.firstName} ${user.lastName}.`);
         await group.save();
         return { unsettled: await transactionService.getUnsettledListInfo(unsettled), expenseList: group.expensesList };

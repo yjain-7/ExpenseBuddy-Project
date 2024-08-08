@@ -5,7 +5,8 @@ const UnsettledCard = ({ unsettled, groupCode, setUnsettled }) => {
   const handleSettle = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch('https://expensebuddy-backend-n7y9.onrender.com/api/expenses/settle', {
+      const BASEURL = import.meta.env.VITE_BASEURL
+      const response = await fetch(BASEURL+'expenses/settle', {
         method: 'DELETE',
         headers: {
           Authorization: auth,

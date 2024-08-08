@@ -11,7 +11,8 @@ function GroupInfoCard({ title, description, groupCode, auth }) {
     setError(null);
 
     try {
-      const url = new URL("https://expensebuddy-backend-n7y9.onrender.com/api/groups/getGroup");
+      const BASEURL = import.meta.env.VITE_BASEURL
+      const url = new URL(BASEURL+"groups/getGroup");
       const response = await fetch(url, {
         method: "POST",
         headers: {

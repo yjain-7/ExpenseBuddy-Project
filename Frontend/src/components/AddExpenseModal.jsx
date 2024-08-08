@@ -21,7 +21,8 @@ export default function AddExpenseModal({ auth, onClose, usersList, groupCode, s
   }
   const submitExpense = async () => {
     try {
-      const url = "https://expensebuddy-backend-n7y9.onrender.com/api/expenses/addExpense";
+      const BASEURL = import.meta.env.VITE_BASEURL
+      const url = BASEURL+"expenses/addExpense";
       const response = await fetch(url, {
         method: "POST",
         headers: {

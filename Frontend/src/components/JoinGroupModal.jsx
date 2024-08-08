@@ -13,8 +13,9 @@ const JoinGroupModal = ({ auth, onClose }) => {
       return;
     }
     try {
+      const BASEURL = import.meta.env.VITE_BASEURL
       const response = await fetch(
-        "https://expensebuddy-backend-n7y9.onrender.com/api/groups/joinGroup",
+        BASEURL+"groups/joinGroup",
         {
           method: "POST",
           headers: {

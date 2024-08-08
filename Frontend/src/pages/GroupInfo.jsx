@@ -31,7 +31,8 @@ export const GroupInfo = () => {
 
   const simplifyDebts = async () => {
     try {
-      const url = "https://expensebuddy-backend-n7y9.onrender.com/api/expenses/simplify";
+      const BASEURL = import.meta.env.VITE_BASEURL
+      const url = BASEURL+"expenses/simplify";
       const response = await fetch(url, {
         method: "POST",
         headers: {

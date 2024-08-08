@@ -48,7 +48,8 @@ export default function Signup() {
     };
 
     try {
-      const response = await fetch('https://expensebuddy-backend-n7y9.onrender.com/api/users/signUp', {
+      const BASEURL = import.meta.env.VITE_BASEURL
+      const response = await fetch(BASEURL+'users/signUp', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
