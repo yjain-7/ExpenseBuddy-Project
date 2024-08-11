@@ -25,7 +25,7 @@ exports.createGroup = async (userId, name, description) => {
             createdBy: { userId: userId, name: user.name },
         });
 
-        newGroup.usersList.push({ userId: userId, name: user.firstName });
+        newGroup.usersList.push(userId);
         const group = await newGroup.save();
         user.groupsList.push({ groupId: group._id, name: group.name, description: group.description, groupCode: group.groupCode });
         await user.save();
@@ -54,7 +54,7 @@ exports.joinGroup = async (userId, groupCode) => {
         if (group.usersList.length === 10) {
             return null;
         }
-        group.usersList.push({ userId: userId, name: user.firstName });
+        group.usersList.push( userId );
         group.activities.push(`${user.firstName} ${user.lastName} joined the group.`)
         await group.save();
         user.groupsList.push({ groupId: group._id, name: group.name, description: group.description, groupCode: group.groupCode });
@@ -107,22 +107,26 @@ exports.addExpense = async (req, groupCode, debts, paidBy, expense) => {
 exports.getGroup = async (groupCode) => {
     try {
         let group = await this.getGroupObject(groupCode);
-        let user = await User.findOne({ _id: group.createdBy.userId })
+        const userListInfoMap = await getUserListInfoMap(group.usersList);
+        // let user = await User.findOne({ _id: group.createdBy.userId })
         // console.log(group)
         let groupData = {
             name: group?.name ?? 'Default Name',
             description: group?.description ?? 'No description provided',
             groupCode: groupCode ?? 'Unknown Group Code',
-            createdBy: user.firstName + " " + user.lastName ?? 'Unknown Creator',
-            usersList: group?.usersList ?? []
+            createdBy: userListInfoMap[group.createdBy.userId],
         };
 
+        const usernameList = Object.entries(userListInfoMap).map(([key, value]) => ({
+            userId: key,
+            name: value
+        }));
 
-        // console.log(group?.expensesList ?? [])
 
+        groupData.usersList = usernameList
         const [expenses, unsettledList] = await Promise.all([
-            expenseService.getExpenseList(group.expensesList),
-            transactionService.getUnsettledListInfo(group.unsettled)
+            expenseService.getExpenseList(group.expensesList, userListInfoMap),
+            transactionService.getUnsettledListInfo(group.unsettled, userListInfoMap)
         ]);
 
         groupData.expenseList = expenses;
@@ -174,7 +178,20 @@ function generateGroupCode() {
 }
 
 function userAlreadyExist(group, userId) {
-    return group.usersList.some(user => user.userId.toString() === userId.toString());
+    return group.usersList.some(user => user.toString() === userId.toString());
 }
 
+async function getUserListInfoMap(userList) {
+    let userListInfoMap = {};
 
+    // Fetch only the firstname and lastname fields for the users whose IDs are in the userList array
+    const users = await User.find({ _id: { $in: userList } }, 'firstName lastName');
+
+    // Create the mapping of user IDs to full names
+    users.forEach(user => {
+        const fullName = `${user.firstName} ${user.lastName}`;
+        userListInfoMap[user._id] = fullName;
+    });
+
+    return userListInfoMap;
+}
