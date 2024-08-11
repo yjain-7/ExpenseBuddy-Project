@@ -1,6 +1,6 @@
 import React from 'react';
 
-const UnsettledCard = ({ unsettled, groupCode, setUnsettled }) => {
+const UnsettledCard = ({ unsettled, groupCode, setUnsettled,setActivityTab }) => {
   const auth = localStorage.getItem('authToken');
   const handleSettle = async (e) => {
     e.preventDefault();
@@ -15,8 +15,10 @@ const UnsettledCard = ({ unsettled, groupCode, setUnsettled }) => {
         body: JSON.stringify({ groupCode: groupCode, unsettledId: unsettled.id }),
       });
       if (response.ok) {
+        const data = await response.json();
         // Assuming `setUnsettled` is a state setter for an array of unsettled expenses
         setUnsettled((prevUnsettled) => prevUnsettled.filter((item) => item.id !== unsettled.id));
+        setActivityTab(prevActivityTab => [data.activity, ...prevActivityTab])
         alert('Expense Settled');
       } else {
         alert('Error settling expense');

@@ -19,7 +19,7 @@ export const GroupInfo = () => {
   const [unsettled, setUnsettled] = useState(
     JSON.parse(searchParams.get("unsettled") || "[]")
   );
-  const [activityTab, setActivitTab] = useState(
+  const [activityTab, setActivityTab] = useState(
     JSON.parse(searchParams.get("activites") || "[]")
   );
   const [showUsers, setShowUsers] = useState(false);
@@ -157,7 +157,7 @@ export const GroupInfo = () => {
           <div>
             {usersList.length > 0 ? (
               usersList.map((userData) => (
-                <UserListCard key={userData.userId} name={userData.name} />
+                <UserListCard key={userData.userId} name={userData.name } />
               ))
             ) : (
               <p>No users found.</p>
@@ -182,8 +182,8 @@ export const GroupInfo = () => {
                 key={debt.id}
                 unsettled={debt}
                 setUnsettled={setUnsettled}
-                auth={token}
                 groupCode={groupCode}
+                setActivityTab={setActivityTab}
               />
             ))
           ) : (
@@ -259,8 +259,8 @@ export const GroupInfo = () => {
                   key={debt.id}
                   unsettled={debt}
                   setUnsettled={setUnsettled}
-                  auth={token}
                   groupCode={groupCode}
+                  setActivityTab={setActivityTab}
                 />
               ))
             ) : (

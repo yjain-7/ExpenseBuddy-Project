@@ -75,8 +75,8 @@ exports.getExpenseList = async (expenseList, userListInfoMap) => {
                     title : expense.title,
                     description: expense.description,
                     amount: expense.totalAmount,
-                    createdBy: userListInfoMap(expense.createdBy),
-                    paidBy: userListInfoMap(expense.paidBy),
+                    createdBy: userListInfoMap[expense.createdBy],
+                    paidBy: userListInfoMap[expense.paidBy],
                     debts: debts,
                     date: expense.date,
                 });

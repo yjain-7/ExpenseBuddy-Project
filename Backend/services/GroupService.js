@@ -25,7 +25,7 @@ exports.createGroup = async (userId, name, description) => {
             createdBy: { userId: userId, name: user.name },
         });
 
-        newGroup.usersList.push({ userId: userId });
+        newGroup.usersList.push(userId);
         const group = await newGroup.save();
         user.groupsList.push({ groupId: group._id, name: group.name, description: group.description, groupCode: group.groupCode });
         await user.save();
@@ -54,7 +54,7 @@ exports.joinGroup = async (userId, groupCode) => {
         if (group.usersList.length === 10) {
             return null;
         }
-        group.usersList.push({ userId: userId });
+        group.usersList.push( userId );
         group.activities.push(`${user.firstName} ${user.lastName} joined the group.`)
         await group.save();
         user.groupsList.push({ groupId: group._id, name: group.name, description: group.description, groupCode: group.groupCode });
@@ -114,11 +114,16 @@ exports.getGroup = async (groupCode) => {
             name: group?.name ?? 'Default Name',
             description: group?.description ?? 'No description provided',
             groupCode: groupCode ?? 'Unknown Group Code',
-            createdBy: userListInfoMap[group.createdBy],
+            createdBy: userListInfoMap[group.createdBy.userId],
         };
 
-        const usernameList = Object.values(userListInfoMap);
-        groupData.userList = usernameList
+        const usernameList = Object.entries(userListInfoMap).map(([key, value]) => ({
+            userId: key,
+            name: value
+        }));
+
+
+        groupData.usersList = usernameList
         const [expenses, unsettledList] = await Promise.all([
             expenseService.getExpenseList(group.expensesList, userListInfoMap),
             transactionService.getUnsettledListInfo(group.unsettled, userListInfoMap)
@@ -173,7 +178,7 @@ function generateGroupCode() {
 }
 
 function userAlreadyExist(group, userId) {
-    return group.usersList.some(user => user.userId.toString() === userId.toString());
+    return group.usersList.some(user => user.toString() === userId.toString());
 }
 
 async function getUserListInfoMap(userList) {

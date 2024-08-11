@@ -30,7 +30,7 @@ exports.getDebtInfo = async (debtsIdList, userListInfoMap) => {
             // const user = await userService.getUserInfo(owedBy)
             // console.log(user)
             debtInfo.push({
-                owedBy: userListInfoMap(owedBy),
+                owedBy: userListInfoMap[owedBy],
                 amount,
             });
         }
