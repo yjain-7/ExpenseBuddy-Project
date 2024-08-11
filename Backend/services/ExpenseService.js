@@ -61,27 +61,22 @@ exports.simplify = async (unsettled) => {
     return simplified
 };
 
-exports.getExpenseList = async (expenseList) => {
+exports.getExpenseList = async (expenseList, userListInfoMap) => {
     // console.log(expenseList)
     let expenses = [];
     for (const expenseid of expenseList) {
         try {
             let expense = await Expense.findById(expenseid);
             if (expense) {
-                const [paidBy, debts, createdBy] = await Promise.all([
-                    userService.getUserInfo(expense.paidBy),
-                    debtsService.getDebtInfo(expense.debts),
-                    userService.getUserInfo(expense.createdBy),
-
-                ]);
+                const debts = await debtsService.getDebtInfo(expense.debts, userListInfoMap)
 
                 expenses.push({
                     _id: expense._id,
                     title : expense.title,
                     description: expense.description,
                     amount: expense.totalAmount,
-                    createdBy: createdBy.firstName,
-                    paidBy: paidBy.firstName,
+                    createdBy: userListInfoMap(expense.createdBy),
+                    paidBy: userListInfoMap(expense.paidBy),
                     debts: debts,
                     date: expense.date,
                 });

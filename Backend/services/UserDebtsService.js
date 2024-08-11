@@ -21,16 +21,16 @@ exports.createDebt = async (debts, paidBy) => {
 }
 
 
-exports.getDebtInfo = async (debtsIdList) => {
+exports.getDebtInfo = async (debtsIdList, userListInfoMap) => {
     let debtInfo = []
 
     try {
         for (const id of debtsIdList) {
             const { owedBy, amount } = await Debt.findById(id);
-            const user = await userService.getUserInfo(owedBy)
+            // const user = await userService.getUserInfo(owedBy)
             // console.log(user)
             debtInfo.push({
-                owedBy: user.firstName,
+                owedBy: userListInfoMap(owedBy),
                 amount,
             });
         }
