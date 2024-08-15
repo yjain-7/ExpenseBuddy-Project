@@ -8,24 +8,24 @@ export default {
     extend: {
       colors: {
         logo: "#b3efdc",
+        hover: "#0ff7ae"
       },
     },
   },
   plugins: [
     function ({ addUtilities }) {
-      addUtilities(
-        {
-          '.scrollbar-hidden': {
-            /* Hide scrollbar for WebKit browsers */
-            '&::-webkit-scrollbar': {
-              display: 'none',
-            },
-            /* Hide scrollbar for Firefox */
-            'scrollbar-width': 'none',
-          },
+      const newUtilities = {
+        '.no-scrollbar::-webkit-scrollbar': {
+          display: 'none',
         },
-        ['responsive', 'hover']
-      );
+        '.no-scrollbar': {
+          '-ms-overflow-style': 'none', /* IE and Edge */
+          'scrollbar-width': 'none', /* Firefox */
+        },
+      };
+  
+      addUtilities(newUtilities, ['responsive']);
     },
   ],
+  
 }

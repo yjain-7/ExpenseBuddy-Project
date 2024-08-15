@@ -24,6 +24,11 @@ exports.joinGroup = async (req, res) => {
         if (userInfo === null) {
             return res.status(400).json({ error: 'Cannot add more than 10 users to a group' });
         }
+
+        if (userInfo.error === "User already in the group") {
+            return res.status(400).json({ error: "User is already a member of this group" });
+        }
+        
         res.status(200).json({ message: "Group Joined Successfully", userInfo: userInfo, token: userInfo.token });
     } catch (err) {
         console.error(err);

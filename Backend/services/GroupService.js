@@ -43,7 +43,7 @@ exports.joinGroup = async (userId, groupCode) => {
             throw new Error("Invalid groupCode");
         }
         if (userAlreadyExist(group, userId)) {
-            throw new Error("User already in the group");
+            return { error: "User already in the group" };
         }
 
 
@@ -83,6 +83,7 @@ exports.addExpense = async (req, groupCode, debts, paidBy, expense) => {
     try {
         // console.log(groupCode)
         const group = await groupService.getGroupObject(groupCode)
+        const userListInfoMap = await getUserListInfoMap(group.usersList)
         if (!group) {
             throw new Error("Group not found");
         }
@@ -94,9 +95,12 @@ exports.addExpense = async (req, groupCode, debts, paidBy, expense) => {
         group.unsettled = unsettled
         const user = await User.findOne({ _id: req.userId })
         const { title, totalAmount } = req.body
-        group.activities.unshift(`Expense '${title}' of ${totalAmount} added by ${user.firstName} ${user.lastName}.`);
+        const activity = `Expense '${title}' of ${totalAmount} added by ${user.firstName} ${user.lastName}.`
+        group.activities.unshift(activity);
         await group.save();
-        return { unsettled: await transactionService.getUnsettledListInfo(unsettled), expenseList: group.expensesList };
+        // return { unsettled: await transactionService.getUnsettledListInfo(unsettled, userListInfoMap), expenseList: group.expensesList ,activity :activity, userListInfoMap : userListInfoMap};
+        return { unsettled: unsettled, expenseList: group.expensesList ,activity :activity, userListInfoMap : userListInfoMap};
+
     } catch (error) {
         console.error(error);
         return false;
@@ -178,7 +182,7 @@ function generateGroupCode() {
 }
 
 function userAlreadyExist(group, userId) {
-    return group.usersList.some(user => user.toString() === userId.toString());
+    return group.usersList.some(user => user._id.toString() === userId.toString());
 }
 
 async function getUserListInfoMap(userList) {

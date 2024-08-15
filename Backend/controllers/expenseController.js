@@ -22,15 +22,20 @@ exports.addExpense = async (req, res) => {
       return res.status(500).json({ message: "Failed to add expense" });
     }
 
-    const { unsettled, expenseList } = await groupService.addExpense(req, groupCode, debts, paidBy, expense);
+    const { unsettled, expenseList,activity, userListInfoMap } = await groupService.addExpense(req, groupCode, debts, paidBy, expense);
     if (!unsettled) {
       return res
         .status(500)
         .json({ message: "Failed to add expense to group" });
     }
 
-    const unsettledListInfo = await getUnsettledListInfo(unsettled);
-    const expenseListInfo = await expenseService.getExpenseList(expenseList);
+    // const [unsettledListInfo, expenseListInfo] = Promise.all([
+    //   getUnsettledListInfo(unsettled, userListInfoMap),
+    //   expenseService.getExpenseList(expenseList, userListInfoMap)
+    // ])
+
+    const unsettledListInfo = await getUnsettledListInfo(unsettled, userListInfoMap);
+    const expenseListInfo = await expenseService.getExpenseList(expenseList, userListInfoMap);
     return res
       .status(200)
       .json({
@@ -38,6 +43,7 @@ exports.addExpense = async (req, res) => {
         expense: expense,
         unsettled: unsettledListInfo,
         expenseList: expenseListInfo,
+        activity : activity 
       });
   } catch (err) {
     console.error(err);
@@ -49,11 +55,12 @@ exports.simplify = async (req, res) => {
   try {
     const groupCode = req.body.groupCode;
     const group = await groupService.getGroupObject(groupCode);
+    const userListInfoMap = await getUserListInfoMap(group.usersList);
 
     const newUnsettled = await expenseService.simplify(group.unsettled);
 
     const newUnsettledList = await saveTransaction(newUnsettled);
-    const newUnsettledInfo = await getUnsettledListInfo(newUnsettledList)
+    const newUnsettledInfo = await getUnsettledListInfo(newUnsettledList, userListInfoMap)
 
     group.unsettled = newUnsettledList;
     const user = await User.findOne({ _id: req.userId })
@@ -111,4 +118,20 @@ async function saveTransaction(newUnsettled) {
     console.log("Error in saveTransaction:", err.message);
     throw err;
   }
+}
+
+
+async function getUserListInfoMap(userList) {
+  let userListInfoMap = {};
+
+  // Fetch only the firstname and lastname fields for the users whose IDs are in the userList array
+  const users = await User.find({ _id: { $in: userList } }, 'firstName lastName');
+
+  // Create the mapping of user IDs to full names
+  users.forEach(user => {
+      const fullName = `${user.firstName} ${user.lastName}`;
+      userListInfoMap[user._id] = fullName;
+  });
+
+  return userListInfoMap;
 }
