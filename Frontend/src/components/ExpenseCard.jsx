@@ -10,6 +10,7 @@ const ExpenseCard = ({ expense }) => {
   const handleEdit = () => {
     // Function to handle edit action
     console.log("Edit button clicked");
+    alert("Edit feature under development")
   };
 
   return (
@@ -45,7 +46,7 @@ const ExpenseCard = ({ expense }) => {
           <div className="ml-4">
             <button 
               onClick={handleEdit} 
-              className="mt-8 p-2 pl-4 pr-4 bg-logo rounded hover:bg-logo"
+              className="mt-8 p-2 pl-4 pr-4 bg-logo rounded hover:bg-hover"
             >
               Edit
             </button>

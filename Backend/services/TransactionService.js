@@ -98,7 +98,7 @@ function removeUnsettledTransaction(unsettled, transactionId) {
     }
 }
 
-exports.getUnsettledListInfo = async (unsettled) => {
+exports.getUnsettledListInfo = async (unsettled, userListInfoMap) => {
     try {
         const unsettledList = [];
         for (const id of unsettled) {
@@ -106,8 +106,8 @@ exports.getUnsettledListInfo = async (unsettled) => {
             const transaction = await Transaction.findById(objectId);
             unsettledList.push({
                 id: transaction.id.toString(),
-                paidBy: (await userService.getUserInfo(transaction.paidBy)).firstName,
-                owedBy: (await userService.getUserInfo(transaction.owedBy)).firstName,
+                paidBy: userListInfoMap[transaction.paidBy],
+                owedBy: userListInfoMap[transaction.owedBy],
                 amount: parseFloat(transaction.amount),
             });
         }

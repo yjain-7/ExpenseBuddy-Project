@@ -30,7 +30,7 @@ const JoinGroupModal = ({ auth, onClose }) => {
       const userInfo = data.userInfo;
       console.log(userInfo);
       if (response.ok) {
-        onClose();
+        onClose
       } else {
         // Handle error
         if(!response.ok){
@@ -42,6 +42,8 @@ const JoinGroupModal = ({ auth, onClose }) => {
       navigate("/userInfo", { state: { userInfo } });
     } catch (error) {
       setError(error.message);
+    }finally{
+      onClose();
     }
   };
 

@@ -152,8 +152,8 @@ export const GroupInfo = () => {
       </div>
 
       {/* Content Sections */}
-      <div className="hidden md:grid md:grid-cols-4 gap-3 mt-4 h-[calc(100%-120px)]">
-        <div className="overflow-y-auto p-2">
+      <div className="hidden md:grid md:grid-cols-4 gap-3 mt-4 h-[calc(100%-120px)] ">
+        <div className="overflow-y-auto p-2 no-scrollbar">
           <div>
             {usersList.length > 0 ? (
               usersList.map((userData) => (
@@ -165,7 +165,7 @@ export const GroupInfo = () => {
           </div>
         </div>
 
-        <div className="overflow-y-auto p-2">
+        <div className="overflow-y-auto p-2 max-h-[calc(100%-120px)] pb-16 no-scrollbar">
           {expenseList.length > 0 ? (
             expenseList.map((expense) => (
               <ExpenseCard key={expense._id} expense={expense} />
@@ -175,7 +175,7 @@ export const GroupInfo = () => {
           )}
         </div>
 
-        <div className="overflow-y-auto p-2">
+        <div className="overflow-y-auto p-2 max-h-[calc(100%-120px)] pb-16 no-scrollbar">
           {unsettled.length > 0 ? (
             unsettled.map((debt) => (
               <UnsettledCard
@@ -191,7 +191,7 @@ export const GroupInfo = () => {
           )}
         </div>
 
-        <div className="overflow-y-auto p-2 space-y-2">
+        <div className="overflow-y-auto p-2 space-y-2 max-h-[calc(100%-120px)] no-scrollbar">
           {activityTab.length > 0 ? (
             activityTab.map((activity, index) => (
               <div
@@ -318,6 +318,7 @@ export const GroupInfo = () => {
               groupCode={groupCode}
               setExpenseList={setExpenseList}
               setUnsettled={setUnsettled}
+              setActivityTab={setActivityTab}
             />
           </div>
         </>
@@ -338,7 +339,7 @@ function Button({ onClick, text }) {
   return (
     <button
       onClick={onClick}
-      className="bg-logo px-4 py-2 rounded-lg font-semibold text-lg"
+      className="bg-logo px-4 py-2 rounded-lg font-semibold text-lg hover:bg-hover"
     >
       {text}
     </button>

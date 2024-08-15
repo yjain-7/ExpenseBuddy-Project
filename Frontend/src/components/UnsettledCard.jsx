@@ -37,7 +37,7 @@ const UnsettledCard = ({ unsettled, groupCode, setUnsettled,setActivityTab }) =>
       <div>
         <button
           onClick={handleSettle}
-          className="px-4 py-2 bg-logo rounded hover:bg-logo-500"
+          className="px-4 py-2 bg-logo rounded hover:bg-hover"
         >
           Settle
         </button>

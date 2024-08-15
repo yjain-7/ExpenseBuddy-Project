@@ -12,6 +12,7 @@ export default function AddExpenseModal({
   groupCode,
   setExpenseList,
   setUnsettled,
+  setActivityTab
 }) {
   const [title, setTitle] = useState("");
   const [amount, setAmount] = useState();
@@ -54,6 +55,7 @@ export default function AddExpenseModal({
         alert(data.message);
         setExpenseList(data.expenseList);
         setUnsettled(data.unsettled);
+        setActivityTab(prevActivityTab => [data.activity, ...prevActivityTab])
         onClose();
       }
     } catch (e) {
@@ -96,7 +98,7 @@ export default function AddExpenseModal({
       onClick={(e) => e.target === e.currentTarget && onClose()}
       className="fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm flex justify-center items-start pt-20"
     >
-      <div className="bg-logo rounded-xl p-6 flex flex-col gap-5 items-center mx-4 text-black max-w-lg w-full max-h-[90vh] overflow-auto scrollbar-hidden">
+      <div className="bg-logo rounded-xl p-6 flex flex-col gap-5 items-center mx-4 text-black max-w-lg w-full max-h-[90vh] overflow-auto no-scrollbar">
         <button onClick={onClose} className="place-self-end">
           <X size={30} />
         </button>
@@ -183,7 +185,7 @@ export default function AddExpenseModal({
             {error && <p className="text-red-500">{error}</p>}
             <button
               type="submit"
-              className="mt-4 w-full flex items-center justify-center gap-2 px-5 py-3 font-medium rounded-md bg-black text-white"
+              className="mt-4 w-full flex items-center justify-center gap-2 px-5 py-3 font-medium rounded-md bg-black text-white hover:bg-gray-900"
               disabled={isDisabled}
               onClick={handleAddExpenseButton}
             >
