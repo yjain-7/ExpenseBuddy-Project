@@ -19,7 +19,7 @@ const UnsettledCard = ({ unsettled, groupCode, setUnsettled,setActivityTab }) =>
         // Assuming `setUnsettled` is a state setter for an array of unsettled expenses
         setUnsettled((prevUnsettled) => prevUnsettled.filter((item) => item.id !== unsettled.id));
         setActivityTab(prevActivityTab => [data.activity, ...prevActivityTab])
-        alert('Expense Settled');
+        alert('Debt settled: This only tracks the settlement, not the actual payment.');
       } else {
         alert('Error settling expense');
       }
