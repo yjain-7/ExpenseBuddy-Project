@@ -1,13 +1,19 @@
 import Card from "../components/Card";
 import InputField from "../components/InputField";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
+import CustomAlert from "../components/CustomAlert";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
+  const [showAlert, setShowAlert] = useState(true);
   const navigate = useNavigate();
+
+  const handleAlertClose = () => {
+    setShowAlert(false);
+  };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -20,8 +26,8 @@ export default function Login() {
     setError(null);
 
     try {
-      const BASEURL = import.meta.env.VITE_BASEURL
-      const response = await fetch(BASEURL+"users/login", {
+      const BASEURL = import.meta.env.VITE_BASEURL;
+      const response = await fetch(BASEURL + "users/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -46,6 +52,12 @@ export default function Login() {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2">
+      {showAlert && (
+        <CustomAlert
+          message="⚠️ Please Note: This website is hosted on a free service. If the backend has been inactive, the server may take up to 1 minute to respond for the first time. Thank you for your patience!"
+          onClose={handleAlertClose}
+        />
+      )}
       <div className="flex items-center justify-center min-h-screen">
         <form onSubmit={handleSubmit}>
           <div className="flex justify-center text-2xl font-extrabold text-gray-700 mb-1 pb-3">
@@ -83,7 +95,7 @@ export default function Login() {
           <div className="mt-10 font-bold text-gray-500">
             <div>Dummy accout</div>
             <div>email : user1@gmail.com</div>
-            <div>passowrd : 123456</div>
+            <div>password : 123456</div>
           </div>
         </form>
       </div>

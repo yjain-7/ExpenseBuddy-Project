@@ -28,12 +28,6 @@ exports.addExpense = async (req, res) => {
         .status(500)
         .json({ message: "Failed to add expense to group" });
     }
-
-    // const [unsettledListInfo, expenseListInfo] = Promise.all([
-    //   getUnsettledListInfo(unsettled, userListInfoMap),
-    //   expenseService.getExpenseList(expenseList, userListInfoMap)
-    // ])
-
     const unsettledListInfo = await getUnsettledListInfo(unsettled, userListInfoMap);
     const expenseListInfo = await expenseService.getExpenseList(expenseList, userListInfoMap);
     return res
