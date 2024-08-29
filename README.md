@@ -19,18 +19,18 @@ Expense-Buddy is a powerful debt simplification tool designed to help groups man
 ## How It Works
 
 Consider a group with three users: Alice, Bob, and Charlie. The initial debts are as follows:
-- Alice owes Bob $50
-- Alice owes Charlie $20
-- Bob owes Charlie $30
+- Alice owes Bob ₹50
+- Alice owes Charlie ₹20
+- Bob owes Charlie ₹30
 
 Without simplification, there would be three transactions:
-1. Alice pays Bob $50
-2. Alice pays Charlie $20
-3. Bob pays Charlie $30
+1. Alice pays Bob ₹50
+2. Alice pays Charlie ₹20
+3. Bob pays Charlie ₹30
 
 With Expense-Buddy's simplification feature, the transactions are reduced to:
-1. Alice pays Bob $20
-2. Alice pays Charlie $50
+1. Alice pays Bob ₹20
+2. Alice pays Charlie ₹50
 
 This simplification minimizes the number of transactions while ensuring that everyone is paid what they are owed.
 
