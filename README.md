@@ -1,7 +1,5 @@
 # Expense-Buddy
 
-![Expense Buddy Logo](https://via.placeholder.com/150x150.png?text=Expense+Buddy)
-
 Expense-Buddy is a powerful debt simplification tool designed to help groups manage shared expenses efficiently. Whether you're splitting bills with roommates, planning a group trip, or managing team expenses, Expense-Buddy streamlines the process and minimizes the hassle of settling debts.
 
 ## Features
