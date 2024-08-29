@@ -76,10 +76,6 @@ To get Expense-Buddy up and running on your local machine, follow these steps:
 
 We welcome contributions to Expense-Buddy! If you have suggestions for improvements or encounter any issues, please feel free to open an issue or submit a pull request.
 
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
 ---
 
 Happy expense tracking with Expense-Buddy! 💰🤝
